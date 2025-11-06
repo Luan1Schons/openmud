@@ -1,0 +1,470 @@
+[
+  {
+    "id": "merchant_central",
+    "name": "Vendedor Amigável",
+    "description": "Um comerciante sorridente com uma barraca cheia de mercadorias.",
+    "npc_type": "shopkeeper",
+    "room_id": "central",
+    "dialogue": [
+      "Bem-vindo à minha loja!",
+      "Tenho os melhores itens da região!",
+      "Volte sempre!"
+    ],
+    "shop_items": [
+      {
+        "item_id": "potion_hp_small",
+        "price": 10
+      },
+      {
+        "item_id": "potion_hp_medium",
+        "price": 25
+      },
+      {
+        "item_id": "potion_hp_large",
+        "price": 50
+      },
+      {
+        "item_id": "potion_stamina_small",
+        "price": 10
+      },
+      {
+        "item_id": "potion_stamina_medium",
+        "price": 25
+      },
+      {
+        "item_id": "potion_stamina_large",
+        "price": 50
+      },
+      {
+        "item_id": "potion_mana_small",
+        "price": 10
+      },
+      {
+        "item_id": "potion_mana_medium",
+        "price": 25
+      },
+      {
+        "item_id": "potion_mana_large",
+        "price": 50
+      },
+      {
+        "item_id": "sword",
+        "price": 30
+      },
+      {
+        "item_id": "armor",
+        "price": 25
+      }
+    ],
+    "lore": "Um comerciante experiente que viaja pela região vendendo seus produtos."
+  },
+  {
+    "id": "guard_city",
+    "name": "Guarda da Cidade",
+    "description": "Um guarda armado vigiando a entrada da cidade.",
+    "npc_type": "normal",
+    "room_id": "cidade",
+    "dialogue": [
+      "Mantenha a ordem na cidade!",
+      "Se precisar de ajuda, estou aqui.",
+      "Cuidado com os perigos da floresta.",
+      "A torre abandonada está cheia de espíritos perigosos..."
+    ],
+    "quests": ["clear_tower_abandoned"],
+    "lore": "Um guarda dedicado que protege a cidade há muitos anos."
+  },
+  {
+    "id": "quest_giver_forest",
+    "name": "Eremita da Floresta",
+    "description": "Um ancião sábio vivendo isolado na floresta.",
+    "npc_type": "quest_giver",
+    "room_id": "floresta",
+    "dialogue": [
+      "A floresta está cheia de perigos...",
+      "Preciso de ajuda para proteger este lugar.",
+      "Você parece ser capaz de ajudar.",
+      "A floresta escura precisa ser limpa de criaturas sombrias."
+    ],
+    "quests": ["clear_dark_forest"],
+    "lore": "Um eremita que conhece todos os segredos da floresta sombria."
+  },
+  {
+    "id": "trader_beach",
+    "name": "Navegador",
+    "description": "Um viajante experiente que troca itens raros.",
+    "npc_type": "trader",
+    "room_id": "praia",
+    "dialogue": [
+      "Tenho itens raros de terras distantes!",
+      "Fazemos trocas justas aqui.",
+      "O que você tem para trocar?"
+    ],
+    "trade_items": {
+      "give": ["shell", "pearl"],
+      "receive": ["compass", "map"]
+    },
+    "lore": "Um navegador que coleciona itens raros de suas viagens."
+  },
+  {
+    "id": "pirate_beach",
+    "name": "Pirata",
+    "description": "Um pirata de olhos brilhantes e barba desgrenhada. Ele parece estar procurando algo importante.",
+    "npc_type": "quest_giver",
+    "room_id": "praia",
+    "dialogue": [
+      "Argh! Preciso daquele mapa do tesouro!",
+      "O Navegador tem algo que eu preciso...",
+      "Se você me trouxer o mapa, te dou uma recompensa generosa!",
+      "Mas cuidado... haverá um custo."
+    ],
+    "quests": ["pirate_treasure_map"],
+    "lore": "Um pirata misterioso que busca o mapa do tesouro perdido. Dizem que ele faria qualquer coisa para obtê-lo."
+  },
+  {
+    "id": "mage_vendor_cavern",
+    "name": "Mago Ancião",
+    "description": "Um mago ancião com uma barba longa e olhos brilhantes. Ele vende cajados poderosos.",
+    "npc_type": "shopkeeper",
+    "room_id": "caverna_profunda",
+    "dialogue": [
+      "Bem-vindo, jovem mago!",
+      "Tenho cajados de poder imenso...",
+      "Mas eles não são baratos!"
+    ],
+    "shop_items": [
+      {
+        "item_id": "staff_arcane",
+        "price": 500
+      },
+      {
+        "item_id": "staff_elder",
+        "price": 1500
+      },
+      {
+        "item_id": "potion_mana_large",
+        "price": 50
+      }
+    ],
+    "quests": ["collect_soul_fragments", "collect_crystal_magic"],
+    "lore": "Um mago ancião que guarda os segredos das artes arcanas e vende cajados poderosos."
+  },
+  {
+    "id": "warrior_vendor_temple",
+    "name": "Mestre de Armas",
+    "description": "Um guerreiro veterano com cicatrizes de batalha. Ele vende espadas lendárias.",
+    "npc_type": "shopkeeper",
+    "room_id": "templo_antigo",
+    "dialogue": [
+      "Aprecio um bom guerreiro!",
+      "Minhas espadas são as melhores do reino!",
+      "Mas custam caro..."
+    ],
+    "shop_items": [
+      {
+        "item_id": "sword_steel",
+        "price": 400
+      },
+      {
+        "item_id": "sword_legendary",
+        "price": 2000
+      },
+      {
+        "item_id": "armadura_ferro",
+        "price": 100
+      }
+    ],
+    "quests": ["clear_ice_cavern"],
+    "lore": "Um mestre de armas que forja as melhores espadas do reino. Dizem que ele já lutou em mil batalhas."
+  },
+  {
+    "id": "ranger_vendor_forest",
+    "name": "Mestre Caçador Élfico",
+    "description": "Um elfo ancião com um arco brilhante. Ele vende os melhores arcos para arqueiros.",
+    "npc_type": "shopkeeper",
+    "room_id": "bosque_elfico",
+    "dialogue": [
+      "Bem-vindo ao bosque, caçador!",
+      "Meus arcos são feitos com madeira élfica mágica!",
+      "Apenas os melhores arqueiros podem usá-los!"
+    ],
+    "shop_items": [
+      {
+        "item_id": "bow_elven",
+        "price": 450
+      },
+      {
+        "item_id": "bow_ancient",
+        "price": 1800
+      },
+      {
+        "item_id": "potion_stamina_large",
+        "price": 50
+      }
+    ],
+    "quests": ["collect_ancient_wood", "protect_elfic_forest"],
+    "lore": "Um mestre caçador élfico que cria os melhores arcos do mundo. Suas flechas nunca erram o alvo."
+  },
+  {
+    "id": "alchemist_shop",
+    "name": "Alquimista",
+    "description": "Um alquimista experiente cercado por vidros, poções e ingredientes mágicos. Ele conhece os segredos das ervas.",
+    "npc_type": "shopkeeper",
+    "room_id": "alquimista",
+    "dialogue": [
+      "Bem-vindo ao meu laboratório!",
+      "Tenho poções raras e ingredientes mágicos.",
+      "Cuidado com os experimentos em andamento!"
+    ],
+    "shop_items": [
+      {
+        "item_id": "potion_hp_large",
+        "price": 50
+      },
+      {
+        "item_id": "potion_mana_large",
+        "price": 50
+      },
+      {
+        "item_id": "potion_stamina_large",
+        "price": 50
+      },
+      {
+        "item_id": "rare_herb",
+        "price": 75
+      },
+      {
+        "item_id": "essence_light",
+        "price": 100
+      }
+    ],
+    "quests": ["collect_rare_herbs", "collect_basilisk_scales"],
+    "lore": "Um alquimista mestre que dedica sua vida ao estudo das poções e ingredientes mágicos."
+  },
+  {
+    "id": "blacksmith",
+    "name": "Ferrão",
+    "description": "Um ferrão robusto com braços musculosos. O calor da forja reflete em seu rosto suado.",
+    "npc_type": "shopkeeper",
+    "room_id": "ferraria",
+    "dialogue": [
+      "Precisa de uma arma? Eu faço as melhores!",
+      "Minha forja está sempre quente!",
+      "Apenas o melhor aço para meus clientes!"
+    ],
+    "shop_items": [
+      {
+        "item_id": "sword",
+        "price": 150
+      },
+      {
+        "item_id": "armor",
+        "price": 200
+      },
+      {
+        "item_id": "armadura_ferro",
+        "price": 300
+      }
+    ],
+    "quests": ["collect_iron_ore", "collect_troll_hides"],
+    "lore": "Um ferrão experiente que forja as melhores armas e armaduras da região."
+  },
+  {
+    "id": "fisherman",
+    "name": "Pescador",
+    "description": "Um pescador idoso com barba branca. Ele conhece todos os segredos do mar.",
+    "npc_type": "quest_giver",
+    "room_id": "cabana_pescador",
+    "dialogue": [
+      "O mar guarda muitos segredos...",
+      "Já vi coisas estranhas nas águas profundas.",
+      "Preciso de ajuda para uma pescaria especial."
+    ],
+    "quests": ["monster_fish"],
+    "lore": "Um pescador experiente que conhece os segredos do oceano e suas criaturas."
+  },
+  {
+    "id": "astronomer",
+    "name": "Astrônomo",
+    "description": "Um estudioso que observa as estrelas através de um telescópio antigo. Ele conhece as constelações.",
+    "npc_type": "quest_giver",
+    "room_id": "topo_torre",
+    "dialogue": [
+      "As estrelas contam histórias antigas...",
+      "Preciso de ajuda para coletar dados celestiais.",
+      "O cosmos guarda segredos incríveis!"
+    ],
+    "quests": ["collect_star_dust"],
+    "lore": "Um astrônomo que dedica sua vida ao estudo dos céus e das estrelas."
+  },
+  {
+    "id": "hermit_cave",
+    "name": "Eremita da Gruta",
+    "description": "Um eremita antigo que vive isolado na gruta. Ele conhece os segredos dos cristais.",
+    "npc_type": "quest_giver",
+    "room_id": "gruta_secreta",
+    "dialogue": [
+      "Finalmente, alguém encontrou meu refúgio...",
+      "Os cristais aqui têm poderes especiais.",
+      "Preciso de ajuda para proteger este lugar sagrado."
+    ],
+    "quests": ["protect_crystals"],
+    "lore": "Um eremita sábio que guarda os segredos dos cristais mágicos da gruta."
+  },
+  {
+    "id": "merchant_district",
+    "name": "Mercador Principal",
+    "description": "Um mercador rico que vende itens diversos no distrito dos mercadores.",
+    "npc_type": "shopkeeper",
+    "room_id": "distrito_mercadores",
+    "dialogue": [
+      "Bem-vindo ao distrito dos mercadores!",
+      "Tenho itens de todas as partes do mundo!",
+      "Os melhores preços aqui!",
+      "Posso pagar bem por materiais raros!"
+    ],
+    "shop_items": [
+      {
+        "item_id": "potion_hp_medium",
+        "price": 25
+      },
+      {
+        "item_id": "potion_stamina_medium",
+        "price": 25
+      },
+      {
+        "item_id": "potion_mana_medium",
+        "price": 25
+      },
+      {
+        "item_id": "herb",
+        "price": 10
+      },
+      {
+        "item_id": "compass",
+        "price": 50
+      }
+    ],
+    "quests": ["collect_spider_silk", "collect_ectoplasm", "collect_dragon_scales", "collect_rare_gems"],
+    "lore": "Um mercador próspero que vende itens de todas as partes de Eldoria."
+  },
+  {
+    "id": "mercador_ruinas",
+    "name": "Mercador das Ruínas",
+    "description": "Um mercador corajoso que estabeleceu um acampamento nas ruínas. Vende itens raros encontrados nas ruínas.",
+    "npc_type": "shopkeeper",
+    "room_id": "mercado_ruínas",
+    "dialogue": [
+      "Olá, aventureiro! Bem-vindo ao Mercado das Ruínas!",
+      "Encontrei itens raros nas ruínas desta cidade antiga.",
+      "Cuidado com os perigos lá fora!",
+      "Se conseguir me ajudar, posso pagar bem!"
+    ],
+    "shop_items": [
+      {"item_id": "potion_hp_medium", "price": 20},
+      {"item_id": "potion_hp_large", "price": 40},
+      {"item_id": "potion_stamina_medium", "price": 20},
+      {"item_id": "potion_stamina_large", "price": 40},
+      {"item_id": "potion_mana_medium", "price": 20},
+      {"item_id": "potion_mana_large", "price": 40},
+      {"item_id": "ancient_coin", "price": 150},
+      {"item_id": "ruined_artifact", "price": 300}
+    ],
+    "quests": ["collect_ancient_artifacts", "clear_ruins_ghosts"],
+    "lore": "Um mercador que encontrou nas ruínas itens esquecidos há séculos."
+  },
+  {
+    "id": "caravaneiro",
+    "name": "Líder da Caravana",
+    "description": "O líder de uma caravana de mercadores viajantes. Vende itens raros de terras distantes.",
+    "npc_type": "shopkeeper",
+    "room_id": "acampamento_caravana",
+    "dialogue": [
+      "Bem-vindo ao acampamento da caravana!",
+      "Temos itens de terras muito distantes!",
+      "Alguns são raros e valiosos!",
+      "Preciso de ajuda para proteger a caravana!"
+    ],
+    "shop_items": [
+      {"item_id": "potion_hp_large", "price": 35},
+      {"item_id": "potion_stamina_large", "price": 35},
+      {"item_id": "potion_mana_large", "price": 35},
+      {"item_id": "desert_pearl", "price": 250},
+      {"item_id": "caravan_compass", "price": 200},
+      {"item_id": "exotic_herb", "price": 180}
+    ],
+    "quests": ["desert_supplies", "protect_caravan"],
+    "lore": "Um líder de caravana que viaja pelos desertos vendendo tesouros exóticos."
+  },
+  {
+    "id": "merchant_oasis",
+    "name": "Mercador do Oásis",
+    "description": "Um mercador que estabeleceu um posto no oásis. Vende suprimentos e alguns itens raros para aventureiros.",
+    "npc_type": "shopkeeper",
+    "room_id": "oásis",
+    "dialogue": [
+      "Bem-vindo ao oásis!",
+      "Precisa de suprimentos para sua jornada?",
+      "Tenho poções e alguns itens especiais do deserto!",
+      "Posso pagar bem por itens raros do oásis!"
+    ],
+    "shop_items": [
+      {"item_id": "potion_hp_medium", "price": 22},
+      {"item_id": "potion_hp_large", "price": 45},
+      {"item_id": "potion_stamina_medium", "price": 22},
+      {"item_id": "potion_stamina_large", "price": 45},
+      {"item_id": "potion_mana_medium", "price": 22},
+      {"item_id": "potion_mana_large", "price": 45},
+      {"item_id": "oasis_water", "price": 100},
+      {"item_id": "desert_rose", "price": 175}
+    ],
+    "quests": ["collect_oasis_water", "desert_rose_collection"],
+    "lore": "Um mercador que encontrou no oásis um lugar seguro para vender suprimentos."
+  },
+  {
+    "id": "merchant_perdido",
+    "name": "Mercador da Cidade Perdida",
+    "description": "Um mercador misterioso que encontrou a cidade perdida. Vende tesouros raros encontrados nas areias.",
+    "npc_type": "shopkeeper",
+    "room_id": "mercado_perdido",
+    "dialogue": [
+      "Você encontrou a cidade perdida!",
+      "Tenho tesouros que foram enterrados há milênios!",
+      "Cada item tem uma história antiga!",
+      "Preciso de ajuda para explorar as pirâmides!"
+    ],
+    "shop_items": [
+      {"item_id": "potion_hp_large", "price": 30},
+      {"item_id": "potion_stamina_large", "price": 30},
+      {"item_id": "potion_mana_large", "price": 30},
+      {"item_id": "lost_artifact", "price": 500},
+      {"item_id": "pharaoh_gold", "price": 400},
+      {"item_id": "ancient_scarab", "price": 350}
+    ],
+    "quests": ["lost_city_treasures", "clear_pyramid_mummies"],
+    "lore": "Um mercador que descobriu tesouros da cidade perdida e os vende para aventureiros corajosos."
+  },
+  {
+    "id": "merchant_sombrio",
+    "name": "Mercador Sombrio",
+    "description": "Um mercador sombrio que vende itens proibidos e raros no mercado das sombras.",
+    "npc_type": "shopkeeper",
+    "room_id": "mercado_sombrio",
+    "dialogue": [
+      "Bem-vindo ao mercado das sombras...",
+      "Aqui você encontra o que não encontra em lugar nenhum.",
+      "Mas cuidado, alguns itens têm um preço alto...",
+      "Preciso de itens do plano sombrio... posso pagar bem."
+    ],
+    "shop_items": [
+      {"item_id": "potion_hp_large", "price": 25},
+      {"item_id": "potion_stamina_large", "price": 25},
+      {"item_id": "potion_mana_large", "price": 25},
+      {"item_id": "shadow_gem", "price": 600},
+      {"item_id": "void_crystal", "price": 750},
+      {"item_id": "forbidden_tome", "price": 800}
+    ],
+    "quests": ["shadow_gems_collection", "void_crystal_quest", "clear_shadow_plane"],
+    "lore": "Um mercador que vende itens proibidos e raros do plano sombrio."
+  }
+]
+

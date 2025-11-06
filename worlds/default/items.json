@@ -1,0 +1,621 @@
+[
+  {
+    "id": "potion_hp_small",
+    "name": "Poção de Vida Pequena",
+    "description": "Uma poção vermelha que restaura 20 HP imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "hp": 20
+    },
+    "value": 10,
+    "rarity": "common"
+  },
+  {
+    "id": "potion_hp_medium",
+    "name": "Poção de Vida Média",
+    "description": "Uma poção vermelha que restaura 50 HP imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "hp": 50
+    },
+    "value": 25,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "potion_hp_large",
+    "name": "Poção de Vida Grande",
+    "description": "Uma poção vermelha que restaura 100 HP imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "hp": 100
+    },
+    "value": 50,
+    "rarity": "rare"
+  },
+  {
+    "id": "potion_stamina_small",
+    "name": "Poção de Stamina Pequena",
+    "description": "Uma poção azul que restaura 20 de stamina imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "stamina": 20
+    },
+    "value": 10,
+    "rarity": "common"
+  },
+  {
+    "id": "potion_stamina_medium",
+    "name": "Poção de Stamina Média",
+    "description": "Uma poção azul que restaura 50 de stamina imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "stamina": 50
+    },
+    "value": 25,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "potion_stamina_large",
+    "name": "Poção de Stamina Grande",
+    "description": "Uma poção azul que restaura 100 de stamina imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "stamina": 100
+    },
+    "value": 50,
+    "rarity": "rare"
+  },
+  {
+    "id": "potion_mana_small",
+    "name": "Poção de Mana Pequena",
+    "description": "Uma poção roxa que restaura 20 de mana imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "mana": 20
+    },
+    "value": 10,
+    "rarity": "common"
+  },
+  {
+    "id": "potion_mana_medium",
+    "name": "Poção de Mana Média",
+    "description": "Uma poção roxa que restaura 50 de mana imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "mana": 50
+    },
+    "value": 25,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "potion_mana_large",
+    "name": "Poção de Mana Grande",
+    "description": "Uma poção roxa que restaura 100 de mana imediatamente.",
+    "type": "consumable",
+    "stats": {
+      "mana": 100
+    },
+    "value": 50,
+    "rarity": "rare"
+  },
+  {
+    "id": "herb",
+    "name": "Erva Medicinal",
+    "description": "Uma erva comum que restaura 5 HP.",
+    "type": "consumable",
+    "stats": {
+      "hp": 5
+    },
+    "value": 2,
+    "rarity": "common"
+  },
+  {
+    "id": "sword",
+    "name": "Espada",
+    "description": "Uma espada de ferro básica.",
+    "type": "weapon",
+    "stats": {
+      "attack": 5
+    },
+    "value": 30,
+    "rarity": "common"
+  },
+  {
+    "id": "armor",
+    "name": "Armadura",
+    "description": "Uma armadura de couro básica.",
+    "type": "armor",
+    "stats": {
+      "defense": 3
+    },
+    "value": 25,
+    "rarity": "common"
+  },
+  {
+    "id": "gold_coin",
+    "name": "Moeda de Ouro",
+    "description": "Uma moeda de ouro valiosa.",
+    "type": "misc",
+    "stats": {},
+    "value": 1,
+    "rarity": "common"
+  },
+  {
+    "id": "pelt",
+    "name": "Pele de Animal",
+    "description": "Uma pele de animal que pode ser vendida.",
+    "type": "misc",
+    "stats": {},
+    "value": 5,
+    "rarity": "common"
+  },
+  {
+    "id": "spider_silk",
+    "name": "Seda de Aranha",
+    "description": "Seda brilhante de uma aranha gigante.",
+    "type": "misc",
+    "stats": {},
+    "value": 15,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "venom_sac",
+    "name": "Saco de Veneno",
+    "description": "Um saco cheio de veneno de aranha.",
+    "type": "misc",
+    "stats": {},
+    "value": 20,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "rare_herb",
+    "name": "Erva Rara",
+    "description": "Uma erva rara que restaura 30 HP.",
+    "type": "consumable",
+    "stats": {
+      "hp": 30
+    },
+    "value": 15,
+    "rarity": "rare"
+  },
+  {
+    "id": "clava",
+    "name": "Clava",
+    "description": "Uma clava de madeira simples.",
+    "type": "weapon",
+    "stats": {
+      "attack": 3
+    },
+    "value": 10,
+    "rarity": "common"
+  },
+  {
+    "id": "machadinha",
+    "name": "Machadinha",
+    "description": "Uma pequena machadinha enferrujada.",
+    "type": "weapon",
+    "stats": {
+      "attack": 7
+    },
+    "value": 20,
+    "rarity": "common"
+  },
+  {
+    "id": "espada_grande",
+    "name": "Espada Grande",
+    "description": "Uma espada grande e pesada.",
+    "type": "weapon",
+    "stats": {
+      "attack": 12
+    },
+    "value": 60,
+    "rarity": "rare"
+  },
+  {
+    "id": "armadura_couro",
+    "name": "Armadura de Couro",
+    "description": "Uma armadura de couro resistente.",
+    "type": "armor",
+    "stats": {
+      "defense": 5
+    },
+    "value": 40,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "armadura_ferro",
+    "name": "Armadura de Ferro",
+    "description": "Uma armadura de ferro pesada e resistente.",
+    "type": "armor",
+    "stats": {
+      "defense": 10
+    },
+    "value": 100,
+    "rarity": "rare"
+  },
+  {
+    "id": "staff",
+    "name": "Cajado",
+    "description": "Um cajado de madeira simples usado por magos iniciantes.",
+    "type": "weapon",
+    "stats": {
+      "attack": 4
+    },
+    "value": 20,
+    "rarity": "common"
+  },
+  {
+    "id": "spellbook",
+    "name": "Livro de Magias",
+    "description": "Um livro antigo contendo conhecimentos arcanos básicos.",
+    "type": "misc",
+    "stats": {},
+    "value": 50,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "bow",
+    "name": "Arco",
+    "description": "Um arco simples de madeira usado por arqueiros.",
+    "type": "weapon",
+    "stats": {
+      "attack": 6
+    },
+    "value": 25,
+    "rarity": "common"
+  },
+  {
+    "id": "leather_armor",
+    "name": "Armadura de Couro",
+    "description": "Uma armadura leve de couro, ideal para movimentação rápida.",
+    "type": "armor",
+    "stats": {
+      "defense": 4
+    },
+    "value": 30,
+    "rarity": "common"
+  },
+  {
+    "id": "shell",
+    "name": "Concha",
+    "description": "Uma concha bela e rara encontrada na praia.",
+    "type": "misc",
+    "stats": {},
+    "value": 15,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "pearl",
+    "name": "Pérola",
+    "description": "Uma pérola brilhante e valiosa encontrada em ostras.",
+    "type": "misc",
+    "stats": {},
+    "value": 100,
+    "rarity": "rare"
+  },
+  {
+    "id": "compass",
+    "name": "Bússola",
+    "description": "Uma bússola antiga que sempre aponta para o norte. Útil para navegação.",
+    "type": "misc",
+    "stats": {},
+    "value": 50,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "map",
+    "name": "Mapa do Tesouro",
+    "description": "Um mapa antigo que mostra a localização de um tesouro escondido.",
+    "type": "misc",
+    "stats": {},
+    "value": 200,
+    "rarity": "epic"
+  },
+  {
+    "id": "staff_arcane",
+    "name": "Cajado Arcano",
+    "description": "Um cajado antigo entalhado com runas mágicas. Aumenta o poder das magias.",
+    "type": "weapon",
+    "stats": {
+      "attack": 12,
+      "spell_power": 15
+    },
+    "value": 500,
+    "rarity": "rare"
+  },
+  {
+    "id": "staff_elder",
+    "name": "Cajado do Ancião",
+    "description": "Um cajado lendário usado por magos anciãos. Poder mágico imenso.",
+    "type": "weapon",
+    "stats": {
+      "attack": 20,
+      "spell_power": 30
+    },
+    "value": 1500,
+    "rarity": "legendary"
+  },
+  {
+    "id": "sword_steel",
+    "name": "Espada de Aço",
+    "description": "Uma espada afiada de aço forjado. Perfeita para guerreiros.",
+    "type": "weapon",
+    "stats": {
+      "attack": 18
+    },
+    "value": 400,
+    "rarity": "rare"
+  },
+  {
+    "id": "sword_legendary",
+    "name": "Espada Lendária",
+    "description": "Uma espada lendária que brilha com poder divino. A arma definitiva para guerreiros.",
+    "type": "weapon",
+    "stats": {
+      "attack": 35
+    },
+    "value": 2000,
+    "rarity": "legendary"
+  },
+  {
+    "id": "bow_elven",
+    "name": "Arco Élfico",
+    "description": "Um arco elegante feito pelos elfos. Precisão e poder excepcionais.",
+    "type": "weapon",
+    "stats": {
+      "attack": 16,
+      "crit_chance": 10
+    },
+    "value": 450,
+    "rarity": "rare"
+  },
+  {
+    "id": "bow_ancient",
+    "name": "Arco Ancestral",
+    "description": "Um arco antigo de poder imenso. Usado pelos melhores arqueiros da história.",
+    "type": "weapon",
+    "stats": {
+      "attack": 32,
+      "crit_chance": 25
+    },
+    "value": 1800,
+    "rarity": "legendary"
+  },
+  {
+    "id": "bone",
+    "name": "Osso",
+    "description": "Um osso antigo de uma criatura não identificada.",
+    "type": "material",
+    "value": 5,
+    "rarity": "common"
+  },
+  {
+    "id": "ectoplasm",
+    "name": "Ectoplasma",
+    "description": "Uma substância etérea coletada de fantasmas.",
+    "type": "material",
+    "value": 30,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "soul_fragment",
+    "name": "Fragmento de Alma",
+    "description": "Um fragmento de alma presa entre os mundos.",
+    "type": "material",
+    "value": 50,
+    "rarity": "rare"
+  },
+  {
+    "id": "troll_hide",
+    "name": "Pele de Troll",
+    "description": "Uma pele resistente de troll, útil para criar armaduras.",
+    "type": "material",
+    "value": 40,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "dragon_scale",
+    "name": "Escama de Dragão",
+    "description": "Uma escama brilhante de um dragão. Extremamente rara e valiosa.",
+    "type": "material",
+    "value": 200,
+    "rarity": "epic"
+  },
+  {
+    "id": "dragon_fang",
+    "name": "Presa de Dragão",
+    "description": "Uma presa afiada de dragão. Pode ser usada para criar armas poderosas.",
+    "type": "material",
+    "value": 300,
+    "rarity": "epic"
+  },
+  {
+    "id": "essence_light",
+    "name": "Essência de Luz",
+    "description": "Uma essência pura de luz coletada de wisps.",
+    "type": "material",
+    "value": 25,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "ancient_wood",
+    "name": "Madeira Antiga",
+    "description": "Madeira de uma árvore antiga, ainda pulsando com energia mágica.",
+    "type": "material",
+    "value": 35,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "seed_magic",
+    "name": "Semente Mágica",
+    "description": "Uma semente que brilha suavemente. Pode ser usada em alquimia.",
+    "type": "material",
+    "value": 45,
+    "rarity": "rare"
+  },
+  {
+    "id": "basilisk_scale",
+    "name": "Escama de Basilisco",
+    "description": "Uma escama dura de basilisco, resistente a venenos.",
+    "type": "material",
+    "value": 60,
+    "rarity": "rare"
+  },
+  {
+    "id": "rare_gem",
+    "name": "Gema Rara",
+    "description": "Uma gema preciosa que brilha com luz interna.",
+    "type": "material",
+    "value": 100,
+    "rarity": "rare"
+  },
+  {
+    "id": "iron_ore",
+    "name": "Minério de Ferro",
+    "description": "Minério bruto que pode ser refinado em ferro.",
+    "type": "material",
+    "value": 15,
+    "rarity": "common"
+  },
+  {
+    "id": "star_dust",
+    "name": "Pó de Estrela",
+    "description": "Pó coletado das estrelas. Possui propriedades mágicas únicas.",
+    "type": "material",
+    "value": 80,
+    "rarity": "epic"
+  },
+  {
+    "id": "crystal_magic",
+    "name": "Cristal Mágico",
+    "description": "Um cristal que pulsa com energia arcana.",
+    "type": "material",
+    "value": 120,
+    "rarity": "epic"
+  },
+  {
+    "id": "monster_fish",
+    "name": "Peixe Monstruoso",
+    "description": "Um peixe gigante e estranho capturado nas profundezas.",
+    "type": "quest_item",
+    "value": 0,
+    "rarity": "rare"
+  },
+  {
+    "id": "book_magic",
+    "name": "Livro de Magia",
+    "description": "Um grimório antigo com conhecimentos arcanos.",
+    "type": "material",
+    "value": 80,
+    "rarity": "rare"
+  },
+  {
+    "id": "ancient_coin",
+    "name": "Moeda Antiga",
+    "description": "Uma moeda antiga encontrada nas ruínas. Pode ser vendida por um bom preço.",
+    "type": "material",
+    "value": 200,
+    "rarity": "rare"
+  },
+  {
+    "id": "ruined_artifact",
+    "name": "Artefato em Ruínas",
+    "description": "Um artefato antigo parcialmente destruído. Ainda tem valor para colecionadores.",
+    "type": "material",
+    "value": 400,
+    "rarity": "rare"
+  },
+  {
+    "id": "desert_pearl",
+    "name": "Pérola do Deserto",
+    "description": "Uma pérola rara encontrada no deserto. Brilha com uma luz suave.",
+    "type": "material",
+    "value": 300,
+    "rarity": "rare"
+  },
+  {
+    "id": "caravan_compass",
+    "name": "Bússola da Caravana",
+    "description": "Uma bússola mágica que sempre aponta para o norte. Muito útil no deserto.",
+    "type": "tool",
+    "value": 250,
+    "rarity": "rare"
+  },
+  {
+    "id": "exotic_herb",
+    "name": "Erva Exótica",
+    "description": "Uma erva rara de terras distantes. Tem propriedades mágicas.",
+    "type": "material",
+    "value": 220,
+    "rarity": "rare"
+  },
+  {
+    "id": "oasis_water",
+    "name": "Água do Oásis",
+    "description": "Água pura do oásis. Restaura HP e Stamina quando consumida.",
+    "type": "consumable",
+    "value": 120,
+    "stats": {
+      "hp": 50,
+      "stamina": 30
+    },
+    "rarity": "uncommon"
+  },
+  {
+    "id": "desert_rose",
+    "name": "Rosa do Deserto",
+    "description": "Uma rosa rara que cresce apenas em oásis. Tem propriedades curativas.",
+    "type": "material",
+    "value": 200,
+    "rarity": "rare"
+  },
+  {
+    "id": "lost_artifact",
+    "name": "Artefato Perdido",
+    "description": "Um artefato antigo da cidade perdida. Extremamente valioso.",
+    "type": "material",
+    "value": 600,
+    "rarity": "epic"
+  },
+  {
+    "id": "pharaoh_gold",
+    "name": "Ouro do Faraó",
+    "description": "Ouro puro de um túmulo de faraó. Muito raro e valioso.",
+    "type": "material",
+    "value": 500,
+    "rarity": "epic"
+  },
+  {
+    "id": "ancient_scarab",
+    "name": "Escaravelho Antigo",
+    "description": "Um escaravelho de ouro antigo. Um símbolo de poder e riqueza.",
+    "type": "material",
+    "value": 400,
+    "rarity": "epic"
+  },
+  {
+    "id": "shadow_gem",
+    "name": "Gema das Sombras",
+    "description": "Uma gema que absorve luz. Pulsa com energia sombria.",
+    "type": "material",
+    "value": 700,
+    "rarity": "epic"
+  },
+  {
+    "id": "void_crystal",
+    "name": "Cristal do Vazio",
+    "description": "Um cristal do plano sombrio. Contém poder absoluto.",
+    "type": "material",
+    "value": 850,
+    "rarity": "legendary"
+  },
+  {
+    "id": "forbidden_tome",
+    "name": "Tomo Proibido",
+    "description": "Um livro antigo com conhecimento proibido. Muito perigoso e valioso.",
+    "type": "material",
+    "value": 900,
+    "rarity": "legendary"
+  }
+]
+

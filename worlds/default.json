@@ -1,0 +1,1328 @@
+{
+  "id": "default",
+  "name": "Mundo Padrão",
+  "description": "Um mundo simples para começar sua aventura",
+  "start_room": "lobby",
+  "rooms": [
+    {
+      "id": "lobby",
+      "name": "Hall de Entrada",
+      "description": "Um hall majestoso com colunas de mármore e luzes mágicas flutuantes. Este é o ponto de partida para todos os aventureiros. No centro, um portal brilhante leva para as terras de Eldoria. Use 'lobby' para voltar aqui a qualquer momento.",
+      "exits": {
+        "sair": "central",
+        "entrar": "central"
+      },
+      "is_spawn_room": true
+    },
+    {
+      "id": "central",
+      "name": "Praça Central",
+      "description": "Uma ampla praça de pedra. No centro há uma fonte antiga com água cristalina. Você pode ver várias saídas em diferentes direções.",
+      "exits": {
+        "norte": "floresta",
+        "sul": "cidade",
+        "leste": "montanha",
+        "oeste": "praia",
+        "nordeste": "bosque_elfico",
+        "voltar": "lobby"
+      }
+    },
+    {
+      "id": "floresta",
+      "name": "Floresta Sombria",
+      "description": "Árvores altas e antigas criam uma sombra densa. Você ouve sons de animais distantes. À sua frente, uma entrada escura e misteriosa leva para uma caverna. O caminho de volta está ao sul.",
+      "exits": {
+        "sul": "central",
+        "leste": "pantano"
+      }
+    },
+    {
+      "id": "cidade",
+      "name": "Cidade Antiga",
+      "description": "Ruas de pedra e casas antigas. Você vê alguns NPCs caminhando. A praça central está ao norte.",
+      "exits": {
+        "norte": "central",
+        "nordeste": "templo_antigo",
+        "sul": "distrito_mercadores"
+      }
+    },
+    {
+      "id": "montanha",
+      "name": "Encosta da Montanha",
+      "description": "Uma trilha íngreme leva para cima. O ar está mais fresco aqui. A praça central está a oeste.",
+      "exits": {
+        "oeste": "central",
+        "norte": "pico_montanha",
+        "leste": "vale_escondido"
+      }
+    },
+    {
+      "id": "praia",
+      "name": "Praia Deserta",
+      "description": "Areia branca e ondas suaves. O sol brilha intensamente. A praça central está a leste.",
+      "exits": {
+        "leste": "central",
+        "sul": "porto_pequeno",
+        "norte": "praia_norte"
+      }
+    },
+    {
+      "id": "pantano",
+      "name": "Pântano Sombrio",
+      "description": "Águas estagnadas e névoa espessa. Você sente algo se movendo na água lamacenta. A floresta está ao norte.",
+      "exits": {
+        "norte": "floresta",
+        "leste": "ruinas",
+        "sul": "pantano_profundo"
+      }
+    },
+    {
+      "id": "ruinas",
+      "name": "Ruínas Antigas",
+      "description": "Pilares de pedra quebrados e estruturas antigas cobertas de musgo. Há uma sensação de mistério no ar. O pântano está a oeste, a caverna profunda ao norte.",
+      "exits": {
+        "oeste": "pantano",
+        "norte": "caverna_profunda",
+        "baixo": "catacumbas"
+      }
+    },
+    {
+      "id": "caverna_profunda",
+      "name": "Caverna Profunda",
+      "description": "Uma caverna escura e profunda. Cristais brilham nas paredes. Você sente uma presença poderosa aqui. As ruínas estão ao sul.",
+      "exits": {
+        "sul": "ruinas"
+      }
+    },
+    {
+      "id": "pico_montanha",
+      "name": "Pico da Montanha",
+      "description": "O topo da montanha oferece uma vista panorâmica. O ar é rarefeito e frio. A encosta está abaixo.",
+      "exits": {
+        "sul": "montanha"
+      }
+    },
+    {
+      "id": "templo_antigo",
+      "name": "Templo Antigo",
+      "description": "Um templo abandonado com símbolos antigos esculpidos nas paredes. Há uma sensação de paz e poder aqui. A cidade está ao sul.",
+      "exits": {
+        "sul": "cidade"
+      }
+    },
+    {
+      "id": "bosque_elfico",
+      "name": "Bosque Élfico",
+      "description": "Uma floresta mágica com árvores antigas e luzes dançantes. O ar parece vibrar com energia arcana. A floresta sombria está ao sul.",
+      "exits": {
+        "sul": "floresta",
+        "leste": "torre_abandonada",
+        "norte": "lago_cristalino"
+      }
+    },
+    {
+      "id": "torre_abandonada",
+      "name": "Torre Abandonada",
+      "description": "Uma torre de pedra em ruínas que se ergue acima das árvores. Janelas quebradas permitem que o vento assobie pelas salas vazias. O bosque élfico está a oeste.",
+      "exits": {
+        "oeste": "bosque_elfico",
+        "cima": "topo_torre"
+      }
+    },
+    {
+      "id": "topo_torre",
+      "name": "Topo da Torre",
+      "description": "O topo da torre oferece uma vista panorâmica de Eldoria. Um telescópio antigo está aqui, apontando para as estrelas. A escada está abaixo.",
+      "exits": {
+        "baixo": "torre_abandonada"
+      }
+    },
+    {
+      "id": "lago_cristalino",
+      "name": "Lago Cristalino",
+      "description": "Um lago de águas cristalinas que reflete perfeitamente a luz do sol. Peixes coloridos nadam nas profundezas. O bosque élfico está ao sul.",
+      "exits": {
+        "sul": "bosque_elfico",
+        "norte": "cachoeira_oculta"
+      }
+    },
+    {
+      "id": "cachoeira_oculta",
+      "name": "Cachoeira Oculta",
+      "description": "Uma cachoeira majestosa escondida atrás de uma cortina de vegetação. A água cai em uma piscina natural. O lago está ao sul.",
+      "exits": {
+        "sul": "lago_cristalino",
+        "oeste": "gruta_secreta"
+      }
+    },
+    {
+      "id": "gruta_secreta",
+      "name": "Gruta Secreta",
+      "description": "Uma gruta natural escondida atrás da cachoeira. Cristais brilham nas paredes, criando um efeito de luz mágica. A cachoeira está a leste.",
+      "exits": {
+        "leste": "cachoeira_oculta"
+      }
+    },
+    {
+      "id": "pantano_profundo",
+      "name": "Pântano Profundo",
+      "description": "Águas mais profundas e mais escuras. A névoa é quase impenetrável aqui. Você sente algo grande se movendo na água. O pântano sombrio está ao norte.",
+      "exits": {
+        "norte": "pantano",
+        "leste": "ilha_pantano"
+      }
+    },
+    {
+      "id": "ilha_pantano",
+      "name": "Ilha no Pântano",
+      "description": "Uma pequena ilha de terra firme no meio do pântano. Uma cabana de madeira apodrecida está aqui. O pântano profundo está a oeste.",
+      "exits": {
+        "oeste": "pantano_profundo"
+      }
+    },
+    {
+      "id": "catacumbas",
+      "name": "Catacumbas",
+      "description": "Túneis antigos sob as ruínas. Túmulos alinhados nas paredes. O ar é pesado e mágico. As ruínas estão acima.",
+      "exits": {
+        "cima": "ruinas",
+        "sul": "sala_arcana"
+      }
+    },
+    {
+      "id": "sala_arcana",
+      "name": "Sala Arcana",
+      "description": "Uma sala circular com símbolos mágicos no chão. A energia arcana é palpável aqui. As catacumbas estão ao norte.",
+      "exits": {
+        "norte": "catacumbas"
+      }
+    },
+    {
+      "id": "vale_escondido",
+      "name": "Vale Escondido",
+      "description": "Um vale verdejante escondido entre as montanhas. Flores mágicas crescem por toda parte. A encosta da montanha está ao sul.",
+      "exits": {
+        "sul": "montanha",
+        "leste": "mirante_estrelas",
+        "norte": "deserto"
+      }
+    },
+    {
+      "id": "mirante_estrelas",
+      "name": "Mirante das Estrelas",
+      "description": "Um mirante natural no alto da montanha. É o lugar perfeito para observar as estrelas. O vale escondido está a oeste.",
+      "exits": {
+        "oeste": "vale_escondido"
+      }
+    },
+    {
+      "id": "porto_pequeno",
+      "name": "Porto Pequeno",
+      "description": "Um pequeno porto de pesca com alguns barcos ancorados. O cheiro de peixe e sal está no ar. A praia está ao norte.",
+      "exits": {
+        "norte": "praia",
+        "leste": "cabana_pescador"
+      }
+    },
+    {
+      "id": "cabana_pescador",
+      "name": "Cabana do Pescador",
+      "description": "Uma cabana simples de madeira à beira-mar. Redes de pesca estão penduradas. O porto está a oeste.",
+      "exits": {
+        "oeste": "porto_pequeno"
+      }
+    },
+    {
+      "id": "distrito_mercadores",
+      "name": "Distrito dos Mercadores",
+      "description": "Ruas movimentadas com barracas e lojas. Comerciantes de todas as partes vendem suas mercadorias. A cidade antiga está ao norte.",
+      "exits": {
+        "norte": "cidade",
+        "leste": "alquimista",
+        "oeste": "ferraria"
+      }
+    },
+    {
+      "id": "alquimista",
+      "name": "Laboratório de Alquimia",
+      "description": "Um laboratório cheio de vidros, poções e ingredientes estranhos. O cheiro de ervas mágicas enche o ar. O distrito dos mercadores está a oeste.",
+      "exits": {
+        "oeste": "distrito_mercadores"
+      }
+    },
+    {
+      "id": "ferraria",
+      "name": "Ferraria",
+      "description": "Uma forja quente onde o som de martelos ecoa. O ferrão trabalha incansavelmente. O distrito dos mercadores está a leste.",
+      "exits": {
+        "leste": "distrito_mercadores"
+      }
+    },
+    {
+      "id": "praia_norte",
+      "name": "Praia Norte",
+      "description": "Uma extensão mais isolada da praia. O som das ondas é mais forte aqui. Falésias rochosas se erguem ao norte.",
+      "exits": {
+        "sul": "praia",
+        "norte": "falésias",
+        "leste": "praia_leste"
+      }
+    },
+    {
+      "id": "praia_leste",
+      "name": "Praia Leste",
+      "description": "Uma praia com pedras e conchas. O mar está mais agitado nesta parte.",
+      "exits": {
+        "oeste": "praia_norte",
+        "leste": "praia_rochosa"
+      }
+    },
+    {
+      "id": "praia_rochosa",
+      "name": "Praia Rochosa",
+      "description": "Uma área rochosa à beira-mar. Piscinas naturais se formam entre as rochas.",
+      "exits": {
+        "oeste": "praia_leste",
+        "norte": "falésias"
+      }
+    },
+    {
+      "id": "falésias",
+      "name": "Falésias",
+      "description": "Falésias altas com vista para o oceano. O vento sopra forte aqui.",
+      "exits": {
+        "sul": "praia_norte",
+        "norte": "penhasco",
+        "leste": "praia_rochosa"
+      }
+    },
+    {
+      "id": "penhasco",
+      "name": "Penhasco",
+      "description": "Um penhasco perigoso com vista panorâmica. Cuidado com o abismo!",
+      "exits": {
+        "sul": "falésias",
+        "oeste": "caverna_marinha"
+      }
+    },
+    {
+      "id": "caverna_marinha",
+      "name": "Caverna Marinha",
+      "description": "Uma caverna formada pela ação das ondas. O cheiro de sal e algas está no ar.",
+      "exits": {
+        "leste": "penhasco",
+        "norte": "caverna_profunda_mar"
+      }
+    },
+    {
+      "id": "caverna_profunda_mar",
+      "name": "Caverna Profunda do Mar",
+      "description": "As partes mais profundas da caverna marinha. Parece que algo grande vive aqui.",
+      "exits": {
+        "sul": "caverna_marinha"
+      }
+    },
+    {
+      "id": "floresta_norte",
+      "name": "Floresta Norte",
+      "description": "Parte mais densa da floresta. A vegetação é mais espessa e os caminhos mais difíceis.",
+      "exits": {
+        "sul": "floresta",
+        "norte": "floresta_profunda",
+        "leste": "clareira_antiga"
+      }
+    },
+    {
+      "id": "floresta_profunda",
+      "name": "Floresta Profunda",
+      "description": "O coração da floresta. A luz do sol quase não chega aqui. Árvores antigas e gigantes.",
+      "exits": {
+        "sul": "floresta_norte",
+        "oeste": "toca_urso",
+        "leste": "árvore_anciã"
+      }
+    },
+    {
+      "id": "clareira_antiga",
+      "name": "Clareira Antiga",
+      "description": "Uma clareira mágica onde uma árvore anciã cresce. O ar está cheio de energia arcana.",
+      "exits": {
+        "oeste": "floresta_norte",
+        "norte": "árvore_anciã"
+      }
+    },
+    {
+      "id": "árvore_anciã",
+      "name": "Árvore Anciã",
+      "description": "Uma árvore colossal que parece ser tão antiga quanto o próprio mundo. Suas raízes formam uma entrada.",
+      "exits": {
+        "sul": "clareira_antiga",
+        "oeste": "floresta_profunda",
+        "entrar": "interior_arvore"
+      }
+    },
+    {
+      "id": "interior_arvore",
+      "name": "Interior da Árvore",
+      "description": "O interior oco da árvore anciã. Escadas de madeira natural levam para cima e para baixo.",
+      "exits": {
+        "sair": "árvore_anciã",
+        "cima": "topo_arvore",
+        "baixo": "raízes_arvore"
+      }
+    },
+    {
+      "id": "topo_arvore",
+      "name": "Topo da Árvore",
+      "description": "O topo da árvore anciã oferece uma vista incrível de toda a floresta.",
+      "exits": {
+        "baixo": "interior_arvore"
+      }
+    },
+    {
+      "id": "raízes_arvore",
+      "name": "Sistema de Raízes",
+      "description": "Um labirinto de raízes antigas. Algo brilha nas profundezas.",
+      "exits": {
+        "cima": "interior_arvore",
+        "norte": "câmara_raízes"
+      }
+    },
+    {
+      "id": "câmara_raízes",
+      "name": "Câmara das Raízes",
+      "description": "Uma câmara secreta nas raízes da árvore. Cristais mágicos crescem nas paredes.",
+      "exits": {
+        "sul": "raízes_arvore"
+      }
+    },
+    {
+      "id": "toca_urso",
+      "name": "Toca do Urso",
+      "description": "Uma toca grande. Parece que um urso poderoso vive aqui.",
+      "exits": {
+        "leste": "floresta_profunda",
+        "entrar": "toca_profunda"
+      }
+    },
+    {
+      "id": "toca_profunda",
+      "name": "Toca Profunda",
+      "description": "As profundezas da toca. O cheiro é forte e há ossos espalhados.",
+      "exits": {
+        "sair": "toca_urso"
+      }
+    },
+    {
+      "id": "montanha_leste",
+      "name": "Montanha Leste",
+      "description": "Lado leste da montanha. A trilha é mais íngreme aqui.",
+      "exits": {
+        "oeste": "montanha",
+        "leste": "desfiladeiro",
+        "norte": "montanha_norte"
+      }
+    },
+    {
+      "id": "montanha_norte",
+      "name": "Montanha Norte",
+      "description": "A face norte da montanha. Sempre coberta de neve.",
+      "exits": {
+        "sul": "montanha_leste",
+        "norte": "passagem_neve"
+      }
+    },
+    {
+      "id": "passagem_neve",
+      "name": "Passagem de Neve",
+      "description": "Uma passagem estreita entre picos nevados. O vento gelado corta como facas.",
+      "exits": {
+        "sul": "montanha_norte",
+        "norte": "pico_gelo"
+      }
+    },
+    {
+      "id": "pico_gelo",
+      "name": "Pico de Gelo",
+      "description": "O pico mais alto da montanha, sempre coberto de gelo e neve.",
+      "exits": {
+        "sul": "passagem_neve",
+        "baixo": "caverna_gelo"
+      }
+    },
+    {
+      "id": "caverna_gelo",
+      "name": "Caverna de Gelo",
+      "description": "Uma caverna natural formada no gelo. Cristais de gelo brilham em todas as direções.",
+      "exits": {
+        "cima": "pico_gelo",
+        "norte": "câmara_gelo"
+      }
+    },
+    {
+      "id": "câmara_gelo",
+      "name": "Câmara de Gelo",
+      "description": "Uma câmara gigante de gelo. Algo poderoso está congelado aqui.",
+      "exits": {
+        "sul": "caverna_gelo"
+      }
+    },
+    {
+      "id": "desfiladeiro",
+      "name": "Desfiladeiro",
+      "description": "Um desfiladeiro profundo entre as montanhas. O eco ressoa pelas paredes.",
+      "exits": {
+        "oeste": "montanha_leste",
+        "norte": "desfiladeiro_profundo",
+        "leste": "ponte_suspensa"
+      }
+    },
+    {
+      "id": "desfiladeiro_profundo",
+      "name": "Desfiladeiro Profundo",
+      "description": "As partes mais profundas do desfiladeiro. A luz do sol quase não chega aqui.",
+      "exits": {
+        "sul": "desfiladeiro",
+        "oeste": "caverna_rochosa"
+      }
+    },
+    {
+      "id": "caverna_rochosa",
+      "name": "Caverna Rochosa",
+      "description": "Uma caverna natural nas rochas do desfiladeiro.",
+      "exits": {
+        "leste": "desfiladeiro_profundo",
+        "norte": "sala_minerais"
+      }
+    },
+    {
+      "id": "sala_minerais",
+      "name": "Sala de Minerais",
+      "description": "Uma sala cheia de minerais brilhantes. Parece que alguém já minerou aqui.",
+      "exits": {
+        "sul": "caverna_rochosa"
+      }
+    },
+    {
+      "id": "ponte_suspensa",
+      "name": "Ponte Suspensa",
+      "description": "Uma ponte antiga e precária sobre um abismo. Ela balança com o vento.",
+      "exits": {
+        "oeste": "desfiladeiro",
+        "leste": "plateau"
+      }
+    },
+    {
+      "id": "plateau",
+      "name": "Plateau",
+      "description": "Um platô alto com vista para todas as direções. Um vento constante sopra aqui.",
+      "exits": {
+        "oeste": "ponte_suspensa",
+        "norte": "templo_vento"
+      }
+    },
+    {
+      "id": "templo_vento",
+      "name": "Templo do Vento",
+      "description": "Um templo antigo dedicado ao vento. Símbolos de ar e movimento estão esculpidos nas paredes.",
+      "exits": {
+        "sul": "plateau",
+        "entrar": "interior_templo_vento"
+      }
+    },
+    {
+      "id": "interior_templo_vento",
+      "name": "Interior do Templo",
+      "description": "O interior do templo. O vento parece soprar de todas as direções ao mesmo tempo.",
+      "exits": {
+        "sair": "templo_vento",
+        "norte": "altar_vento"
+      }
+    },
+    {
+      "id": "altar_vento",
+      "name": "Altar do Vento",
+      "description": "Um altar antigo onde o poder do vento se concentra. O ar vibra com energia.",
+      "exits": {
+        "sul": "interior_templo_vento"
+      }
+    },
+    {
+      "id": "cidade_norte",
+      "name": "Cidade Norte",
+      "description": "Parte norte da cidade. As casas são mais antigas aqui.",
+      "exits": {
+        "sul": "cidade",
+        "norte": "portão_norte",
+        "leste": "cidade_leste"
+      }
+    },
+    {
+      "id": "cidade_leste",
+      "name": "Cidade Leste",
+      "description": "Parte leste da cidade. Um mercado movimentado está aqui.",
+      "exits": {
+        "oeste": "cidade_norte",
+        "leste": "paredes_cidade",
+        "sul": "distrito_mercadores"
+      }
+    },
+    {
+      "id": "paredes_cidade",
+      "name": "Paredes da Cidade",
+      "description": "As muralhas antigas da cidade. Guardas patrulham o topo.",
+      "exits": {
+        "oeste": "cidade_leste",
+        "cima": "topo_muralha"
+      }
+    },
+    {
+      "id": "topo_muralha",
+      "name": "Topo da Muralha",
+      "description": "O topo da muralha oferece uma vista panorâmica da cidade e das terras ao redor.",
+      "exits": {
+        "baixo": "paredes_cidade"
+      }
+    },
+    {
+      "id": "portão_norte",
+      "name": "Portão Norte",
+      "description": "O portão principal ao norte da cidade. Guardas estão sempre de plantão.",
+      "exits": {
+        "sul": "cidade_norte",
+        "norte": "estrada_norte"
+      }
+    },
+    {
+      "id": "estrada_norte",
+      "name": "Estrada do Norte",
+      "description": "Uma estrada antiga que leva para o norte. Carroças e viajantes passam por aqui.",
+      "exits": {
+        "sul": "portão_norte",
+        "norte": "encruzilhada",
+        "leste": "acampamento"
+      }
+    },
+    {
+      "id": "encruzilhada",
+      "name": "Encruzilhada",
+      "description": "Uma encruzilhada onde várias estradas se encontram. Um marco de pedra indica as direções.",
+      "exits": {
+        "sul": "estrada_norte",
+        "norte": "floresta_escura",
+        "leste": "colina",
+        "oeste": "vale_sombrio"
+      }
+    },
+    {
+      "id": "acampamento",
+      "name": "Acampamento",
+      "description": "Um acampamento de viajantes. Fogueiras estão acesas e tendas estão montadas.",
+      "exits": {
+        "oeste": "estrada_norte"
+      }
+    },
+    {
+      "id": "colina",
+      "name": "Colina",
+      "description": "Uma colina verdejante com uma árvore solitária no topo.",
+      "exits": {
+        "oeste": "encruzilhada",
+        "cima": "topo_colina"
+      }
+    },
+    {
+      "id": "topo_colina",
+      "name": "Topo da Colina",
+      "description": "O topo da colina. A árvore solitária oferece sombra. Vista panorâmica.",
+      "exits": {
+        "baixo": "colina"
+      }
+    },
+    {
+      "id": "vale_sombrio",
+      "name": "Vale Sombrio",
+      "description": "Um vale coberto de sombras. O ar está pesado e mágico.",
+      "exits": {
+        "leste": "encruzilhada",
+        "norte": "vale_profundo"
+      }
+    },
+    {
+      "id": "vale_profundo",
+      "name": "Vale Profundo",
+      "description": "As partes mais profundas do vale. A escuridão é quase absoluta.",
+      "exits": {
+        "sul": "vale_sombrio",
+        "oeste": "caverna_escuridão"
+      }
+    },
+    {
+      "id": "caverna_escuridão",
+      "name": "Caverna da Escuridão",
+      "description": "Uma caverna onde a luz não penetra. Algo antigo dorme aqui.",
+      "exits": {
+        "leste": "vale_profundo",
+        "norte": "câmara_escuridão"
+      }
+    },
+    {
+      "id": "câmara_escuridão",
+      "name": "Câmara da Escuridão",
+      "description": "Uma câmara final onde a escuridão é absoluta. Apenas tochas mágicas iluminam.",
+      "exits": {
+        "sul": "caverna_escuridão"
+      }
+    },
+    {
+      "id": "floresta_escura",
+      "name": "Floresta Escura",
+      "description": "Uma floresta ainda mais sombria. A luz do sol não consegue penetrar a copa densa.",
+      "exits": {
+        "sul": "encruzilhada",
+        "norte": "floresta_negra",
+        "leste": "pântano_escuro"
+      }
+    },
+    {
+      "id": "floresta_negra",
+      "name": "Floresta Negra",
+      "description": "A floresta mais sombria de todas. Árvores mortas e terra enegrecida.",
+      "exits": {
+        "sul": "floresta_escura",
+        "oeste": "torre_negra",
+        "norte": "floresta_proibida"
+      }
+    },
+    {
+      "id": "torre_negra",
+      "name": "Torre Negra",
+      "description": "Uma torre negra e sinistra que se ergue acima das árvores mortas.",
+      "exits": {
+        "leste": "floresta_negra",
+        "entrar": "torre_negra_entrada"
+      }
+    },
+    {
+      "id": "torre_negra_entrada",
+      "name": "Entrada da Torre Negra",
+      "description": "A entrada da torre negra. O ar está carregado de energia sombria.",
+      "exits": {
+        "sair": "torre_negra",
+        "cima": "torre_negra_andar1"
+      }
+    },
+    {
+      "id": "torre_negra_andar1",
+      "name": "Primeiro Andar",
+      "description": "Um andar escuro com estantes cheias de livros proibidos.",
+      "exits": {
+        "cima": "torre_negra_andar2",
+        "baixo": "torre_negra_entrada"
+      }
+    },
+    {
+      "id": "torre_negra_andar2",
+      "name": "Segundo Andar",
+      "description": "Um laboratório sombrio com experimentos estranhos.",
+      "exits": {
+        "cima": "torre_negra_top",
+        "baixo": "torre_negra_andar1"
+      }
+    },
+    {
+      "id": "torre_negra_top",
+      "name": "Topo da Torre Negra",
+      "description": "O topo da torre negra. Uma energia sombria pulsa aqui.",
+      "exits": {
+        "baixo": "torre_negra_andar2"
+      }
+    },
+    {
+      "id": "pântano_escuro",
+      "name": "Pântano Escuro",
+      "description": "Um pântano ainda mais escuro e perigoso. A névoa é quase impenetrável.",
+      "exits": {
+        "oeste": "floresta_escura",
+        "norte": "pântano_veneno"
+      }
+    },
+    {
+      "id": "pântano_veneno",
+      "name": "Pântano Venenoso",
+      "description": "Um pântano onde as águas estão envenenadas. Plantas venenosas crescem por toda parte.",
+      "exits": {
+        "sul": "pântano_escuro",
+        "leste": "ilha_veneno"
+      }
+    },
+    {
+      "id": "ilha_veneno",
+      "name": "Ilha Venenosa",
+      "description": "Uma pequena ilha no meio do pântano venenoso. Uma cabana abandonada está aqui.",
+      "exits": {
+        "oeste": "pântano_veneno",
+        "norte": "pântano_profundo_escuro"
+      }
+    },
+    {
+      "id": "pântano_profundo_escuro",
+      "name": "Pântano Profundo Escuro",
+      "description": "As partes mais profundas e escuras do pântano venenoso. A água está quase negra.",
+      "exits": {
+        "sul": "ilha_veneno",
+        "norte": "cidade_ruínas"
+      }
+    },
+    {
+      "id": "cidade_ruínas",
+      "name": "Cidade em Ruínas",
+      "description": "Uma cidade antiga completamente em ruínas. Algumas estruturas ainda estão de pé. No centro, um acampamento de mercadores se estabeleceu.",
+      "exits": {
+        "sul": "pântano_profundo_escuro",
+        "norte": "castelo_destruído",
+        "leste": "mercado_ruínas",
+        "oeste": "templo_ruínas"
+      }
+    },
+    {
+      "id": "mercado_ruínas",
+      "name": "Mercado das Ruínas",
+      "description": "Um mercado improvisado onde mercadores corajosos vendem itens raros encontrados nas ruínas.",
+      "exits": {
+        "oeste": "cidade_ruínas"
+      }
+    },
+    {
+      "id": "templo_ruínas",
+      "name": "Templo em Ruínas",
+      "description": "Um templo antigo parcialmente destruído. Altares mágicos ainda funcionam.",
+      "exits": {
+        "leste": "cidade_ruínas",
+        "norte": "câmara_templo"
+      }
+    },
+    {
+      "id": "câmara_templo",
+      "name": "Câmara do Templo",
+      "description": "A câmara mais profunda do templo. Uma energia divina emana dos altares.",
+      "exits": {
+        "sul": "templo_ruínas"
+      }
+    },
+    {
+      "id": "castelo_destruído",
+      "name": "Castelo Destruído",
+      "description": "Um castelo gigante em ruínas. Ainda é possível ver sua antiga glória.",
+      "exits": {
+        "sul": "cidade_ruínas",
+        "norte": "torre_castelo",
+        "oeste": "masmorras_castelo",
+        "leste": "salão_principal"
+      }
+    },
+    {
+      "id": "torre_castelo",
+      "name": "Torre do Castelo",
+      "description": "A torre mais alta do castelo. O vento sopra forte aqui.",
+      "exits": {
+        "sul": "castelo_destruído",
+        "cima": "topo_torre_castelo"
+      }
+    },
+    {
+      "id": "topo_torre_castelo",
+      "name": "Topo da Torre",
+      "description": "O topo da torre do castelo oferece vista para todas as terras ao redor.",
+      "exits": {
+        "baixo": "torre_castelo"
+      }
+    },
+    {
+      "id": "masmorras_castelo",
+      "name": "Masmorras do Castelo",
+      "description": "Masmorras profundas e escuras. Algo antigo foi preso aqui.",
+      "exits": {
+        "leste": "castelo_destruído",
+        "norte": "célula_profunda"
+      }
+    },
+    {
+      "id": "célula_profunda",
+      "name": "Célula Profunda",
+      "description": "A cela mais profunda das masmorras. Energia sombria emana das paredes.",
+      "exits": {
+        "sul": "masmorras_castelo"
+      }
+    },
+    {
+      "id": "salão_principal",
+      "name": "Salão Principal",
+      "description": "O salão principal do castelo. Tronos quebrados estão espalhados.",
+      "exits": {
+        "oeste": "castelo_destruído",
+        "norte": "biblioteca_castelo"
+      }
+    },
+    {
+      "id": "biblioteca_castelo",
+      "name": "Biblioteca do Castelo",
+      "description": "Uma biblioteca gigante com livros antigos. Um estudioso estabeleceu aqui.",
+      "exits": {
+        "sul": "salão_principal"
+      }
+    },
+    {
+      "id": "deserto",
+      "name": "Deserto",
+      "description": "Um deserto vasto e árido. O sol queima intensamente.",
+      "exits": {
+        "norte": "oásis",
+        "leste": "dunas",
+        "oeste": "oásis_abandonado"
+      }
+    },
+    {
+      "id": "oásis",
+      "name": "Oásis",
+      "description": "Um oásis verdejante no meio do deserto. Caravanas fazem pausa aqui.",
+      "exits": {
+        "sul": "deserto",
+        "norte": "ruínas_deserto",
+        "leste": "acampamento_caravana"
+      }
+    },
+    {
+      "id": "acampamento_caravana",
+      "name": "Acampamento de Caravana",
+      "description": "Um acampamento de mercadores viajantes. Eles vendem itens raros de terras distantes.",
+      "exits": {
+        "oeste": "oásis"
+      }
+    },
+    {
+      "id": "ruínas_deserto",
+      "name": "Ruínas do Deserto",
+      "description": "Ruínas antigas enterradas na areia. Escavações revelam estruturas antigas.",
+      "exits": {
+        "sul": "oásis",
+        "norte": "pirâmide",
+        "leste": "túmulo_faraó"
+      }
+    },
+    {
+      "id": "pirâmide",
+      "name": "Pirâmide",
+      "description": "Uma pirâmide gigante que se ergue das areias. Uma entrada escura leva para dentro.",
+      "exits": {
+        "sul": "ruínas_deserto",
+        "entrar": "interior_pirâmide"
+      }
+    },
+    {
+      "id": "interior_pirâmide",
+      "name": "Interior da Pirâmide",
+      "description": "Corredores escuros e antigos. Armadilhas e tesouros estão por toda parte.",
+      "exits": {
+        "sair": "pirâmide",
+        "norte": "câmara_real",
+        "baixo": "cripta_pirâmide"
+      }
+    },
+    {
+      "id": "câmara_real",
+      "name": "Câmara Real",
+      "description": "A câmara do faraó. Sarcófagos de ouro estão alinhados.",
+      "exits": {
+        "sul": "interior_pirâmide"
+      }
+    },
+    {
+      "id": "cripta_pirâmide",
+      "name": "Cripta da Pirâmide",
+      "description": "A cripta mais profunda da pirâmide. Um lich antigo guarda os tesouros.",
+      "exits": {
+        "cima": "interior_pirâmide"
+      }
+    },
+    {
+      "id": "túmulo_faraó",
+      "name": "Túmulo do Faraó",
+      "description": "Um túmulo antigo onde um faraó poderoso foi enterrado.",
+      "exits": {
+        "oeste": "ruínas_deserto",
+        "entrar": "interior_túmulo"
+      }
+    },
+    {
+      "id": "interior_túmulo",
+      "name": "Interior do Túmulo",
+      "description": "O interior do túmulo. Hieróglifos antigos cobrem as paredes.",
+      "exits": {
+        "sair": "túmulo_faraó",
+        "norte": "câmara_faraó"
+      }
+    },
+    {
+      "id": "câmara_faraó",
+      "name": "Câmara do Faraó",
+      "description": "A câmara funerária do faraó. Tesouros incalculáveis estão aqui.",
+      "exits": {
+        "sul": "interior_túmulo"
+      }
+    },
+    {
+      "id": "dunas",
+      "name": "Dunas",
+      "description": "Dunas de areia que se estendem infinitamente. O vento sopra areia constantemente.",
+      "exits": {
+        "oeste": "deserto",
+        "norte": "dunas_altas",
+        "leste": "tempestade_areia"
+      }
+    },
+    {
+      "id": "dunas_altas",
+      "name": "Dunas Altas",
+      "description": "Dunas gigantes que bloqueiam a vista. É difícil se orientar aqui.",
+      "exits": {
+        "sul": "dunas",
+        "norte": "oásis_oculto"
+      }
+    },
+    {
+      "id": "oásis_oculto",
+      "name": "Oásis Oculto",
+      "description": "Um oásis secreto escondido entre as dunas. Um eremita sábio vive aqui.",
+      "exits": {
+        "sul": "dunas_altas"
+      }
+    },
+    {
+      "id": "tempestade_areia",
+      "name": "Tempestade de Areia",
+      "description": "Uma tempestade de areia permanente. A visibilidade é quase zero.",
+      "exits": {
+        "oeste": "dunas",
+        "norte": "cidade_perdida"
+      }
+    },
+    {
+      "id": "cidade_perdida",
+      "name": "Cidade Perdida",
+      "description": "Uma cidade antiga completamente perdida nas areias. Apenas partes dela emergem.",
+      "exits": {
+        "sul": "tempestade_areia",
+        "norte": "palácio_perdido",
+        "leste": "mercado_perdido"
+      }
+    },
+    {
+      "id": "palácio_perdido",
+      "name": "Palácio Perdido",
+      "description": "Um palácio gigante parcialmente enterrado. Ainda é possível entrar.",
+      "exits": {
+        "sul": "cidade_perdida",
+        "entrar": "interior_palácio"
+      }
+    },
+    {
+      "id": "interior_palácio",
+      "name": "Interior do Palácio",
+      "description": "O interior do palácio. Salas luxuosas estão cobertas de areia.",
+      "exits": {
+        "sair": "palácio_perdido",
+        "norte": "trono_real"
+      }
+    },
+    {
+      "id": "trono_real",
+      "name": "Salão do Trono",
+      "description": "O salão do trono. Um trono de ouro está no centro.",
+      "exits": {
+        "sul": "interior_palácio"
+      }
+    },
+    {
+      "id": "mercado_perdido",
+      "name": "Mercado Perdido",
+      "description": "Um mercado antigo onde tesouros raros são encontrados e vendidos.",
+      "exits": {
+        "oeste": "cidade_perdida"
+      }
+    },
+    {
+      "id": "oásis_abandonado",
+      "name": "Oásis Abandonado",
+      "description": "Um oásis que secou há muito tempo. Apenas poços secos restam.",
+      "exits": {
+        "leste": "deserto",
+        "norte": "caverna_deserto"
+      }
+    },
+    {
+      "id": "caverna_deserto",
+      "name": "Caverna do Deserto",
+      "description": "Uma caverna natural no deserto. É fria e escura dentro.",
+      "exits": {
+        "sul": "oásis_abandonado",
+        "norte": "câmara_cristal"
+      }
+    },
+    {
+      "id": "câmara_cristal",
+      "name": "Câmara de Cristal",
+      "description": "Uma câmara cheia de cristais mágicos que brilham no escuro.",
+      "exits": {
+        "sul": "caverna_deserto"
+      }
+    },
+    {
+      "id": "floresta_proibida",
+      "name": "Floresta Proibida",
+      "description": "Uma floresta onde poucos se atrevem a entrar. A magia é forte aqui.",
+      "exits": {
+        "norte": "coração_floresta",
+        "leste": "clareira_proibida",
+        "oeste": "templo_elfico"
+      }
+    },
+    {
+      "id": "coração_floresta",
+      "name": "Coração da Floresta",
+      "description": "O coração mágico da floresta proibida. A energia arcana é palpável.",
+      "exits": {
+        "sul": "floresta_proibida",
+        "norte": "árvore_mundo"
+      }
+    },
+    {
+      "id": "árvore_mundo",
+      "name": "Árvore do Mundo",
+      "description": "A árvore mais antiga e poderosa de todas. Suas raízes conectam todos os mundos.",
+      "exits": {
+        "sul": "coração_floresta",
+        "entrar": "interior_árvore_mundo"
+      }
+    },
+    {
+      "id": "interior_árvore_mundo",
+      "name": "Interior da Árvore do Mundo",
+      "description": "O interior da árvore do mundo. Portais para outros planos existem aqui.",
+      "exits": {
+        "sair": "árvore_mundo",
+        "cima": "copa_árvore_mundo"
+      }
+    },
+    {
+      "id": "copa_árvore_mundo",
+      "name": "Copa da Árvore do Mundo",
+      "description": "A copa da árvore do mundo. Você pode ver todos os reinos de aqui.",
+      "exits": {
+        "baixo": "interior_árvore_mundo"
+      }
+    },
+    {
+      "id": "clareira_proibida",
+      "name": "Clareira Proibida",
+      "description": "Uma clareira mágica onde rituais antigos foram realizados.",
+      "exits": {
+        "oeste": "floresta_proibida",
+        "norte": "altar_antigo"
+      }
+    },
+    {
+      "id": "altar_antigo",
+      "name": "Altar Antigo",
+      "description": "Um altar antigo onde os deuses eram adorados. A energia divina ainda está presente.",
+      "exits": {
+        "sul": "clareira_proibida"
+      }
+    },
+    {
+      "id": "templo_elfico",
+      "name": "Templo Élfico",
+      "description": "Um templo élfico antigo. Elfos anciãos guardam este lugar sagrado.",
+      "exits": {
+        "leste": "floresta_proibida",
+        "entrar": "interior_templo_elfico"
+      }
+    },
+    {
+      "id": "interior_templo_elfico",
+      "name": "Interior do Templo",
+      "description": "O interior do templo élfico. Fontes de luz mágica iluminam tudo.",
+      "exits": {
+        "sair": "templo_elfico",
+        "norte": "câmara_elfica"
+      }
+    },
+    {
+      "id": "câmara_elfica",
+      "name": "Câmara Élfica",
+      "description": "A câmara mais sagrada do templo. Artefatos élficos estão guardados aqui.",
+      "exits": {
+        "sul": "interior_templo_elfico"
+      }
+    },
+    {
+      "id": "montanha_gélida",
+      "name": "Montanha Gélida",
+      "description": "Uma montanha completamente coberta de gelo. O vento corta como facas.",
+      "exits": {
+        "norte": "pico_gélido",
+        "leste": "glaciar",
+        "oeste": "caverna_gelo_eterno"
+      }
+    },
+    {
+      "id": "pico_gélido",
+      "name": "Pico Gélido",
+      "description": "O pico mais alto da montanha gélida. O ar é quase impossível de respirar.",
+      "exits": {
+        "sul": "montanha_gélida",
+        "baixo": "câmara_gelo_eterno"
+      }
+    },
+    {
+      "id": "câmara_gelo_eterno",
+      "name": "Câmara de Gelo Eterno",
+      "description": "Uma câmara onde o gelo nunca derrete. Um dragão de gelo antigo dorme aqui.",
+      "exits": {
+        "cima": "pico_gélido"
+      }
+    },
+    {
+      "id": "glaciar",
+      "name": "Glaciar",
+      "description": "Um glaciar gigante que se move lentamente. Fendas profundas estão por toda parte.",
+      "exits": {
+        "oeste": "montanha_gélida",
+        "norte": "fenda_profunda"
+      }
+    },
+    {
+      "id": "fenda_profunda",
+      "name": "Fenda Profunda",
+      "description": "Uma fenda profunda no gelo. Algo antigo está preso nas profundezas.",
+      "exits": {
+        "sul": "glaciar",
+        "baixo": "abismo_gelo"
+      }
+    },
+    {
+      "id": "abismo_gelo",
+      "name": "Abismo de Gelo",
+      "description": "O abismo mais profundo do gelo. A escuridão é absoluta.",
+      "exits": {
+        "cima": "fenda_profunda",
+        "norte": "câmara_anciã"
+      }
+    },
+    {
+      "id": "câmara_anciã",
+      "name": "Câmara Anciã",
+      "description": "Uma câmara onde um ser ancião está preso em gelo eterno.",
+      "exits": {
+        "sul": "abismo_gelo"
+      }
+    },
+    {
+      "id": "caverna_gelo_eterno",
+      "name": "Caverna de Gelo Eterno",
+      "description": "Uma caverna de gelo que nunca derrete. Cristais de gelo mágico crescem aqui.",
+      "exits": {
+        "leste": "montanha_gélida",
+        "norte": "santuario_gelo"
+      }
+    },
+    {
+      "id": "santuario_gelo",
+      "name": "Santuário de Gelo",
+      "description": "Um santuário onde o poder do gelo se concentra. Um guardião de gelo protege este lugar.",
+      "exits": {
+        "sul": "caverna_gelo_eterno"
+      }
+    },
+    {
+      "id": "plano_sombrio",
+      "name": "Plano Sombrio",
+      "description": "Um plano dimensional onde a escuridão reina. Apenas os mais corajosos entram aqui.",
+      "exits": {
+        "norte": "cidade_sombria",
+        "leste": "torre_sombria",
+        "oeste": "abismo_sombrio"
+      }
+    },
+    {
+      "id": "cidade_sombria",
+      "name": "Cidade Sombria",
+      "description": "Uma cidade de sombras. Criaturas sombrias caminham pelas ruas.",
+      "exits": {
+        "sul": "plano_sombrio",
+        "norte": "palácio_sombrio",
+        "leste": "mercado_sombrio"
+      }
+    },
+    {
+      "id": "mercado_sombrio",
+      "name": "Mercado Sombrio",
+      "description": "Um mercado onde mercadores sombrios vendem itens proibidos e raros.",
+      "exits": {
+        "oeste": "cidade_sombria"
+      }
+    },
+    {
+      "id": "palácio_sombrio",
+      "name": "Palácio Sombrio",
+      "description": "Um palácio onde o senhor das sombras reside.",
+      "exits": {
+        "sul": "cidade_sombria",
+        "entrar": "trono_sombrio"
+      }
+    },
+    {
+      "id": "trono_sombrio",
+      "name": "Salão do Trono Sombrio",
+      "description": "O salão do trono sombrio. O senhor das sombras observa tudo de seu trono.",
+      "exits": {
+        "sair": "palácio_sombrio"
+      }
+    },
+    {
+      "id": "torre_sombria",
+      "name": "Torre Sombria",
+      "description": "Uma torre completamente feita de sombras. Mágicos sombrios estudam aqui.",
+      "exits": {
+        "oeste": "plano_sombrio",
+        "cima": "topo_torre_sombria"
+      }
+    },
+    {
+      "id": "topo_torre_sombria",
+      "name": "Topo da Torre Sombria",
+      "description": "O topo da torre sombria. O véu entre os planos é mais fino aqui.",
+      "exits": {
+        "baixo": "torre_sombria"
+      }
+    },
+    {
+      "id": "abismo_sombrio",
+      "name": "Abismo Sombrio",
+      "description": "Um abismo onde a escuridão é absoluta. Nada pode sobreviver aqui por muito tempo.",
+      "exits": {
+        "leste": "plano_sombrio",
+        "norte": "câmara_vazio"
+      }
+    },
+    {
+      "id": "câmara_vazio",
+      "name": "Câmara do Vazio",
+      "description": "Uma câmara onde o vazio absoluto existe. Apenas os mais poderosos podem entrar aqui.",
+      "exits": {
+        "sul": "abismo_sombrio"
+      }
+    }
+  ]
+}
+

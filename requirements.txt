@@ -1,0 +1,10 @@
+# Dependências do MUD
+# Python 3.7+ necessário (usando apenas bibliotecas padrão)
+# SQLite3 é incluído por padrão no Python
+
+# Para carregar variáveis de ambiente do .env
+python-dotenv>=1.0.0
+
+# Opcional: Para usar IA na geração de quests
+# openai>=1.0.0  # Para OpenAI API
+# anthropic>=0.7.0  # Para Anthropic Claude API

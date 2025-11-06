@@ -1,0 +1,26 @@
+# Configuração TinTin++ para o MUD local
+# Use com: tt++ -t tintin_config.tin
+# Ou dentro do TinTin++: #read tintin_config.tin
+
+# Configurações de display
+config {verbatim} {on}
+config {split} {on}
+
+# Aliases úteis para comandos
+alias {n} {norte}
+alias {s} {sul}
+alias {e} {leste}
+alias {o} {oeste}
+alias {l} {look}
+alias {w} {who}
+alias {i} {inventory}
+alias {inv} {inventory}
+alias {st} {stats}
+
+# Triggers para destacar mensagens importantes
+action {^%1 diz:} {#echo {<128>%0}}
+action {^%1 grita:} {#echo {<196>%0}}
+
+# Conectar ao servidor local automaticamente
+session mud_local localhost 4000
+

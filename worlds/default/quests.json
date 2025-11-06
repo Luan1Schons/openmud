@@ -1,0 +1,672 @@
+[
+  {
+    "id": "pirate_treasure_map",
+    "name": "Mapa do Tesouro",
+    "description": "O Pirata precisa do Mapa do Tesouro que está com o Navegador. Ele oferece 500 moedas, mas você precisará sacrificar uma habilidade aprendida.",
+    "lore": "O Pirata está desesperado por encontrar um tesouro perdido. Ele sabe que o Navegador tem o mapa, mas precisa de alguém para obtê-lo. Em troca, oferece uma recompensa generosa, mas há um preço: você deve sacrificar uma de suas habilidades aprendidas como parte de um ritual antigo.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "map",
+        "amount": 1
+      },
+      {
+        "type": "sacrifice_ability",
+        "target": "any",
+        "amount": 1,
+        "description": "Sacrificar uma habilidade (perk ou magia) aprendida"
+      }
+    ],
+    "rewards": {
+      "gold": 500
+    },
+    "giver_npc": "pirate_beach"
+  },
+  {
+    "id": "collect_rare_herbs",
+    "name": "Ervas Raras",
+    "description": "O Alquimista precisa de ervas raras para seus experimentos. Colete 5 ervas raras para ele.",
+    "lore": "O Alquimista está trabalhando em uma poção especial que requer ervas raras encontradas apenas em lugares específicos. Ele precisa de sua ajuda para coletá-las.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "rare_herb",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 150,
+      "experience": 100,
+      "items": ["potion_hp_large"]
+    },
+    "giver_npc": "alchemist_shop"
+  },
+  {
+    "id": "collect_iron_ore",
+    "name": "Minério de Ferro",
+    "description": "O Ferrão precisa de minério de ferro para forjar armas. Colete 10 minérios de ferro.",
+    "lore": "O Ferrão está sem matéria-prima para suas forjas. Ele precisa de minério de ferro que pode ser encontrado nas montanhas.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "iron_ore",
+        "amount": 10
+      }
+    ],
+    "rewards": {
+      "gold": 200,
+      "experience": 120,
+      "items": ["sword"]
+    },
+    "giver_npc": "blacksmith"
+  },
+  {
+    "id": "monster_fish",
+    "name": "Peixe Monstruoso",
+    "description": "O Pescador quer capturar um peixe monstruoso que vive nas profundezas. Derrote-o e traga a prova.",
+    "lore": "Um peixe gigante e perigoso está assustando os pescadores. O Pescador precisa de alguém corajoso para enfrentá-lo.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "basilisk",
+        "amount": 1
+      },
+      {
+        "type": "collect",
+        "target": "monster_fish",
+        "amount": 1
+      }
+    ],
+    "rewards": {
+      "gold": 300,
+      "experience": 200,
+      "items": ["rare_gem"]
+    },
+    "giver_npc": "fisherman"
+  },
+  {
+    "id": "collect_star_dust",
+    "name": "Pó de Estrela",
+    "description": "O Astrônomo precisa de pó de estrela para seus estudos. Colete 3 pós de estrela.",
+    "lore": "O Astrônomo está trabalhando em uma teoria sobre as estrelas e precisa de pó de estrela, que só pode ser coletado em noites especiais.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "star_dust",
+        "amount": 3
+      }
+    ],
+    "rewards": {
+      "gold": 400,
+      "experience": 150,
+      "items": ["crystal_magic"]
+    },
+    "giver_npc": "astronomer"
+  },
+  {
+    "id": "protect_crystals",
+    "name": "Proteger os Cristais",
+    "description": "O Eremita precisa de ajuda para proteger os cristais mágicos da gruta. Elimine as criaturas que ameaçam o local.",
+    "lore": "Criaturas perigosas estão tentando roubar os cristais mágicos da gruta. O Eremita precisa de ajuda para protegê-los.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "goblin",
+        "amount": 5
+      },
+      {
+        "type": "kill",
+        "target": "orc",
+        "amount": 3
+      }
+    ],
+    "rewards": {
+      "gold": 250,
+      "experience": 180,
+      "items": ["crystal_magic"]
+    },
+    "giver_npc": "hermit_cave"
+  },
+  {
+    "id": "collect_ancient_artifacts",
+    "name": "Artefatos Antigos",
+    "description": "O Mercador das Ruínas precisa de artefatos antigos para expandir sua coleção. Colete 3 artefatos em ruínas.",
+    "lore": "O Mercador das Ruínas está construindo uma coleção de artefatos antigos encontrados nas ruínas. Ele precisa de ajuda para encontrar mais itens raros.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "ruined_artifact",
+        "amount": 3
+      },
+      {
+        "type": "collect",
+        "target": "ancient_coin",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 800,
+      "experience": 300,
+      "items": ["potion_hp_large", "potion_mana_large"]
+    },
+    "giver_npc": "mercador_ruinas"
+  },
+  {
+    "id": "clear_ruins_ghosts",
+    "name": "Espíritos das Ruínas",
+    "description": "Espíritos assombram as ruínas. O Mercador das Ruínas precisa que você elimine 8 fantasmas e 5 esqueletos.",
+    "lore": "As ruínas estão infestadas de espíritos que impedem a exploração. O Mercador precisa que alguém limpe o local para que ele possa continuar coletando artefatos.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "ghost",
+        "amount": 8
+      },
+      {
+        "type": "kill",
+        "target": "skeleton",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 600,
+      "experience": 400,
+      "items": ["ancient_coin"]
+    },
+    "giver_npc": "mercador_ruinas"
+  },
+  {
+    "id": "desert_supplies",
+    "name": "Suprimentos do Deserto",
+    "description": "O Líder da Caravana precisa de suprimentos exóticos. Colete 3 ervas exóticas e 2 pérolas do deserto.",
+    "lore": "A caravana está se preparando para uma longa jornada pelo deserto. O líder precisa de suprimentos especiais que só podem ser encontrados em terras distantes.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "exotic_herb",
+        "amount": 3
+      },
+      {
+        "type": "collect",
+        "target": "desert_pearl",
+        "amount": 2
+      }
+    ],
+    "rewards": {
+      "gold": 900,
+      "experience": 350,
+      "items": ["caravan_compass", "potion_stamina_large"]
+    },
+    "giver_npc": "caravaneiro"
+  },
+  {
+    "id": "protect_caravan",
+    "name": "Proteger a Caravana",
+    "description": "Monstros do deserto ameaçam a caravana. Elimine 6 basiliscos e 4 trolls para proteger os viajantes.",
+    "lore": "A caravana está sendo atacada por criaturas perigosas do deserto. O líder precisa de alguém para limpar a rota antes que seja tarde demais.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "basilisk",
+        "amount": 6
+      },
+      {
+        "type": "kill",
+        "target": "troll",
+        "amount": 4
+      }
+    ],
+    "rewards": {
+      "gold": 1000,
+      "experience": 500,
+      "items": ["exotic_herb", "desert_pearl"]
+    },
+    "giver_npc": "caravaneiro"
+  },
+  {
+    "id": "collect_oasis_water",
+    "name": "Água do Oásis",
+    "description": "O Mercador do Oásis precisa de água pura para seus clientes. Colete 5 águas do oásis.",
+    "lore": "O oásis é uma fonte de água pura e curativa. O mercador precisa de ajuda para coletar água para os viajantes que passam pelo deserto.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "oasis_water",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 600,
+      "experience": 250,
+      "items": ["oasis_water", "potion_hp_large"]
+    },
+    "giver_npc": "merchant_oasis"
+  },
+  {
+    "id": "desert_rose_collection",
+    "name": "Rosas do Deserto",
+    "description": "O Mercador do Oásis quer coletar rosas raras do deserto. Traga 4 rosas do deserto.",
+    "lore": "As rosas do deserto são extremamente raras e valiosas. Elas crescem apenas em oásis específicos e têm propriedades curativas especiais.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "desert_rose",
+        "amount": 4
+      }
+    ],
+    "rewards": {
+      "gold": 1000,
+      "experience": 300,
+      "items": ["desert_rose", "oasis_water"]
+    },
+    "giver_npc": "merchant_oasis"
+  },
+  {
+    "id": "lost_city_treasures",
+    "name": "Tesouros da Cidade Perdida",
+    "description": "O Mercador da Cidade Perdida precisa de artefatos antigos. Colete 2 artefatos perdidos e 3 ouros do faraó.",
+    "lore": "A cidade perdida guarda tesouros incalculáveis. O mercador está procurando por artefatos específicos que podem revelar segredos antigos.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "lost_artifact",
+        "amount": 2
+      },
+      {
+        "type": "collect",
+        "target": "pharaoh_gold",
+        "amount": 3
+      }
+    ],
+    "rewards": {
+      "gold": 2000,
+      "experience": 600,
+      "items": ["ancient_scarab", "potion_hp_large", "potion_mana_large"]
+    },
+    "giver_npc": "merchant_perdido"
+  },
+  {
+    "id": "clear_pyramid_mummies",
+    "name": "Guardas da Pirâmide",
+    "description": "A pirâmide está infestada de esqueletos e fantasmas antigos. Elimine 8 esqueletos e 7 fantasmas para o Mercador da Cidade Perdida.",
+    "lore": "As pirâmides são lugares perigosos guardados por espíritos antigos. O mercador precisa que alguém limpe o caminho para que ele possa explorar os tesouros dentro.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "skeleton",
+        "amount": 8
+      },
+      {
+        "type": "kill",
+        "target": "ghost",
+        "amount": 7
+      }
+    ],
+    "rewards": {
+      "gold": 1500,
+      "experience": 700,
+      "items": ["pharaoh_gold", "ancient_scarab"]
+    },
+    "giver_npc": "merchant_perdido"
+  },
+  {
+    "id": "shadow_gems_collection",
+    "name": "Gemas das Sombras",
+    "description": "O Mercador Sombrio precisa de gemas das sombras para seus experimentos. Colete 3 gemas das sombras.",
+    "lore": "As gemas das sombras são itens raros do plano sombrio. O mercador precisa delas para completar um ritual proibido antigo.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "shadow_gem",
+        "amount": 3
+      }
+    ],
+    "rewards": {
+      "gold": 2500,
+      "experience": 800,
+      "items": ["shadow_gem", "potion_mana_large"]
+    },
+    "giver_npc": "merchant_sombrio"
+  },
+  {
+    "id": "void_crystal_quest",
+    "name": "Cristal do Vazio",
+    "description": "O Mercador Sombrio busca o cristal mais poderoso do plano sombrio. Encontre 1 cristal do vazio.",
+    "lore": "O cristal do vazio é o artefato mais poderoso do plano sombrio. Dizem que quem o possui pode controlar as sombras. O mercador está disposto a pagar muito por ele.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "void_crystal",
+        "amount": 1
+      }
+    ],
+    "rewards": {
+      "gold": 3000,
+      "experience": 1000,
+      "items": ["void_crystal", "forbidden_tome"]
+    },
+    "giver_npc": "merchant_sombrio"
+  },
+  {
+    "id": "clear_shadow_plane",
+    "name": "Limpar o Plano Sombrio",
+    "description": "O plano sombrio está repleto de criaturas perigosas. Elimine 12 fantasmas e 8 wisps para o Mercador Sombrio.",
+    "lore": "O plano sombrio é um lugar perigoso onde apenas os mais corajosos se aventuram. O mercador precisa que alguém limpe as criaturas que ameaçam seu mercado.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "ghost",
+        "amount": 12
+      },
+      {
+        "type": "kill",
+        "target": "wisp",
+        "amount": 8
+      }
+    ],
+    "rewards": {
+      "gold": 2000,
+      "experience": 900,
+      "items": ["shadow_gem", "potion_hp_large", "potion_mana_large"]
+    },
+    "giver_npc": "merchant_sombrio"
+  },
+  {
+    "id": "collect_spider_silk",
+    "name": "Seda de Aranha",
+    "description": "O Mercador Principal precisa de seda de aranha para criar armaduras especiais. Colete 8 sedas de aranha.",
+    "lore": "A seda de aranha é um material valioso usado para criar armaduras leves e resistentes. O mercador está pagando bem por ela.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "spider_silk",
+        "amount": 8
+      }
+    ],
+    "rewards": {
+      "gold": 400,
+      "experience": 200,
+      "items": ["armadura_couro", "potion_hp_medium"]
+    },
+    "giver_npc": "merchant_district"
+  },
+  {
+    "id": "collect_ectoplasm",
+    "name": "Ectoplasma",
+    "description": "O Mercador Principal precisa de ectoplasma para um cliente especial. Colete 6 ectoplasmas.",
+    "lore": "O ectoplasma é coletado de fantasmas e tem propriedades mágicas únicas. Um cliente do mercador está disposto a pagar muito por ele.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "ectoplasm",
+        "amount": 6
+      },
+      {
+        "type": "kill",
+        "target": "ghost",
+        "amount": 6
+      }
+    ],
+    "rewards": {
+      "gold": 500,
+      "experience": 300,
+      "items": ["potion_mana_large", "essence_light"]
+    },
+    "giver_npc": "merchant_district"
+  },
+  {
+    "id": "collect_dragon_scales",
+    "name": "Escamas de Dragão",
+    "description": "Um cliente rico precisa de escamas de dragão. Colete 3 escamas de dragão para o Mercador Principal.",
+    "lore": "As escamas de dragão são extremamente raras e valiosas. Um cliente muito rico está disposto a pagar uma fortuna por elas.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "dragon_scale",
+        "amount": 3
+      },
+      {
+        "type": "kill",
+        "target": "dragon_whelp",
+        "amount": 3
+      }
+    ],
+    "rewards": {
+      "gold": 1200,
+      "experience": 800,
+      "items": ["dragon_scale", "potion_hp_large", "potion_mana_large"]
+    },
+    "giver_npc": "merchant_district"
+  },
+  {
+    "id": "collect_ancient_wood",
+    "name": "Madeira Antiga",
+    "description": "O Mestre Caçador Élfico precisa de madeira antiga para criar arcos especiais. Colete 5 madeiras antigas.",
+    "lore": "A madeira antiga vem de árvores milenares e tem propriedades mágicas. O mestre caçador usa ela para criar os melhores arcos.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "ancient_wood",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 700,
+      "experience": 400,
+      "items": ["bow_elven", "seed_magic"]
+    },
+    "giver_npc": "ranger_vendor_forest"
+  },
+  {
+    "id": "protect_elfic_forest",
+    "name": "Proteger o Bosque Élfico",
+    "description": "Criaturas sombrias ameaçam o bosque élfico. Elimine 7 ents hostis e 5 orcs para o Mestre Caçador Élfico.",
+    "lore": "O bosque élfico está sendo invadido por criaturas sombrias. O mestre caçador precisa de ajuda para proteger o santuário dos elfos.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "ent",
+        "amount": 7
+      },
+      {
+        "type": "kill",
+        "target": "orc",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 900,
+      "experience": 500,
+      "items": ["bow_elven", "ancient_wood"]
+    },
+    "giver_npc": "ranger_vendor_forest"
+  },
+  {
+    "id": "collect_soul_fragments",
+    "name": "Fragmentos de Alma",
+    "description": "O Mago Ancião precisa de fragmentos de alma para um ritual poderoso. Colete 4 fragmentos de alma.",
+    "lore": "Os fragmentos de alma são coletados de criaturas mortas e têm propriedades mágicas poderosas. O mago ancião precisa deles para um ritual antigo.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "soul_fragment",
+        "amount": 4
+      },
+      {
+        "type": "kill",
+        "target": "ghost",
+        "amount": 8
+      }
+    ],
+    "rewards": {
+      "gold": 800,
+      "experience": 600,
+      "items": ["staff_arcane", "potion_mana_large"]
+    },
+    "giver_npc": "mage_vendor_cavern"
+  },
+  {
+    "id": "clear_ice_cavern",
+    "name": "Caverna de Gelo",
+    "description": "A caverna de gelo está infestada de criaturas. Elimine 10 trolls e 5 fantasmas para o Mestre de Armas.",
+    "lore": "A caverna de gelo guarda segredos antigos, mas está infestada de criaturas perigosas. O mestre de armas precisa que alguém limpe o caminho.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "troll",
+        "amount": 10
+      },
+      {
+        "type": "kill",
+        "target": "ghost",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 1500,
+      "experience": 700,
+      "items": ["sword_steel", "potion_hp_large"]
+    },
+    "giver_npc": "warrior_vendor_temple"
+  },
+  {
+    "id": "collect_basilisk_scales",
+    "name": "Escamas de Basilisco",
+    "description": "O Alquimista precisa de escamas de basilisco para criar uma poção especial. Colete 6 escamas de basilisco.",
+    "lore": "As escamas de basilisco têm propriedades resistentes a venenos. O alquimista precisa delas para criar uma poção de resistência.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "basilisk_scale",
+        "amount": 6
+      },
+      {
+        "type": "kill",
+        "target": "basilisk",
+        "amount": 6
+      }
+    ],
+    "rewards": {
+      "gold": 1000,
+      "experience": 500,
+      "items": ["potion_hp_large", "potion_mana_large", "basilisk_scale"]
+    },
+    "giver_npc": "alchemist_shop"
+  },
+  {
+    "id": "clear_tower_abandoned",
+    "name": "Torre Abandonada",
+    "description": "A torre abandonada está cheia de espíritos. Elimine 8 wisps e 6 fantasmas para limpar o local.",
+    "lore": "A torre abandonada é um lugar antigo e perigoso onde espíritos antigos residem. Alguém precisa limpar o local para que possa ser explorado.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "wisp",
+        "amount": 8
+      },
+      {
+        "type": "kill",
+        "target": "ghost",
+        "amount": 6
+      }
+    ],
+    "rewards": {
+      "gold": 700,
+      "experience": 450,
+      "items": ["essence_light", "book_magic"]
+    },
+    "giver_npc": "guard_city"
+  },
+  {
+    "id": "collect_troll_hides",
+    "name": "Peles de Troll",
+    "description": "O Ferrão precisa de peles de troll para criar armaduras resistentes. Colete 8 peles de troll.",
+    "lore": "As peles de troll são extremamente resistentes e podem ser usadas para criar armaduras de alta qualidade. O ferrão está pagando bem por elas.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "troll_hide",
+        "amount": 8
+      },
+      {
+        "type": "kill",
+        "target": "troll",
+        "amount": 8
+      }
+    ],
+    "rewards": {
+      "gold": 800,
+      "experience": 550,
+      "items": ["armadura_ferro", "potion_hp_large"]
+    },
+    "giver_npc": "blacksmith"
+  },
+  {
+    "id": "collect_rare_gems",
+    "name": "Gemas Raras",
+    "description": "O Mercador Principal precisa de gemas raras para um cliente especial. Colete 5 gemas raras.",
+    "lore": "As gemas raras são valiosas e podem ser usadas em joalheria ou alquimia. Um cliente rico está disposto a pagar muito por elas.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "rare_gem",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 1100,
+      "experience": 400,
+      "items": ["rare_gem", "potion_hp_large", "potion_mana_large"]
+    },
+    "giver_npc": "merchant_district"
+  },
+  {
+    "id": "clear_dark_forest",
+    "name": "Floresta Escura",
+    "description": "A floresta escura está repleta de criaturas perigosas. Elimine 12 ents, 8 orcs e 5 trolls para limpar o caminho.",
+    "lore": "A floresta escura é um lugar perigoso onde criaturas sombrias residem. Alguém precisa limpar o caminho para que viajantes possam passar em segurança.",
+    "objectives": [
+      {
+        "type": "kill",
+        "target": "ent",
+        "amount": 12
+      },
+      {
+        "type": "kill",
+        "target": "orc",
+        "amount": 8
+      },
+      {
+        "type": "kill",
+        "target": "troll",
+        "amount": 5
+      }
+    ],
+    "rewards": {
+      "gold": 1800,
+      "experience": 900,
+      "items": ["ancient_wood", "seed_magic", "potion_hp_large"]
+    },
+    "giver_npc": "quest_giver_forest"
+  },
+  {
+    "id": "collect_crystal_magic",
+    "name": "Cristais Mágicos",
+    "description": "O Mago Ancião precisa de cristais mágicos para seus experimentos. Colete 4 cristais mágicos.",
+    "lore": "Os cristais mágicos pulsam com energia arcana e são essenciais para rituais poderosos. O mago ancião precisa deles para completar um experimento importante.",
+    "objectives": [
+      {
+        "type": "collect",
+        "target": "crystal_magic",
+        "amount": 4
+      }
+    ],
+    "rewards": {
+      "gold": 1200,
+      "experience": 500,
+      "items": ["crystal_magic", "staff_arcane"]
+    },
+    "giver_npc": "mage_vendor_cavern"
+  }
+]
+

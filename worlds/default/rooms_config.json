@@ -1,0 +1,914 @@
+{
+  "rooms": {
+    "central": {
+      "min_level": 1,
+      "max_level": 1,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "cidade": {
+      "min_level": 1,
+      "max_level": 2,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "floresta": {
+      "min_level": 1,
+      "max_level": 3,
+      "aggressive_monsters": false,
+      "monsters": ["goblin", "wolf"]
+    },
+    "praia": {
+      "min_level": 1,
+      "max_level": 2,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "montanha": {
+      "min_level": 2,
+      "max_level": 4,
+      "aggressive_monsters": false,
+      "monsters": ["wolf"]
+    },
+    "pantano": {
+      "min_level": 2,
+      "max_level": 5,
+      "aggressive_monsters": true,
+      "monsters": ["slime", "spider"]
+    },
+    "ruinas": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost"]
+    },
+    "caverna_profunda": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "orc_warrior"]
+    },
+    "pico_montanha": {
+      "min_level": 8,
+      "max_level": 12,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "orc_warrior"]
+    },
+    "templo_antigo": {
+      "min_level": 4,
+      "max_level": 7,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "bosque_elfico": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": false,
+      "monsters": ["ent", "wisp"]
+    },
+    "pantano_profundo": {
+      "min_level": 4,
+      "max_level": 8,
+      "aggressive_monsters": true,
+      "monsters": ["spider", "basilisk"]
+    },
+    "ilha_pantano": {
+      "min_level": 5,
+      "max_level": 9,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk"]
+    },
+    "catacumbas": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost"]
+    },
+    "sala_arcana": {
+      "min_level": 5,
+      "max_level": 8,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp"]
+    },
+    "vale_escondido": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": false,
+      "monsters": ["troll"]
+    },
+    "mirante_estrelas": {
+      "min_level": 7,
+      "max_level": 11,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "porto_pequeno": {
+      "min_level": 1,
+      "max_level": 3,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "cabana_pescador": {
+      "min_level": 1,
+      "max_level": 2,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "distrito_mercadores": {
+      "min_level": 1,
+      "max_level": 2,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "alquimista": {
+      "min_level": 1,
+      "max_level": 1,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "ferraria": {
+      "min_level": 1,
+      "max_level": 1,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "torre_abandonada": {
+      "min_level": 4,
+      "max_level": 7,
+      "aggressive_monsters": true,
+      "monsters": ["wisp", "ghost"]
+    },
+    "topo_torre": {
+      "min_level": 6,
+      "max_level": 9,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp"]
+    },
+    "lago_cristalino": {
+      "min_level": 3,
+      "max_level": 5,
+      "aggressive_monsters": false,
+      "monsters": ["wisp"]
+    },
+    "cachoeira_oculta": {
+      "min_level": 4,
+      "max_level": 6,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "gruta_secreta": {
+      "min_level": 5,
+      "max_level": 8,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "lobby": {
+      "min_level": 1,
+      "max_level": 1,
+      "aggressive_monsters": false,
+      "monsters": [],
+      "is_spawn_room": true
+    },
+    "praia_norte": {
+      "min_level": 2,
+      "max_level": 4,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "praia_leste": {
+      "min_level": 2,
+      "max_level": 4,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "praia_rochosa": {
+      "min_level": 3,
+      "max_level": 5,
+      "aggressive_monsters": false,
+      "monsters": ["spider"]
+    },
+    "falésias": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "penhasco": {
+      "min_level": 4,
+      "max_level": 7,
+      "aggressive_monsters": true,
+      "monsters": ["wisp"]
+    },
+    "caverna_marinha": {
+      "min_level": 4,
+      "max_level": 8,
+      "aggressive_monsters": true,
+      "monsters": ["spider", "basilisk"]
+    },
+    "caverna_profunda_mar": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk", "troll"]
+    },
+    "floresta_norte": {
+      "min_level": 2,
+      "max_level": 5,
+      "aggressive_monsters": false,
+      "monsters": ["wolf", "goblin"]
+    },
+    "floresta_profunda": {
+      "min_level": 4,
+      "max_level": 8,
+      "aggressive_monsters": true,
+      "monsters": ["orc", "ent", "wolf"]
+    },
+    "clareira_antiga": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": false,
+      "monsters": ["wisp"]
+    },
+    "árvore_anciã": {
+      "min_level": 5,
+      "max_level": 9,
+      "aggressive_monsters": false,
+      "monsters": ["ent"]
+    },
+    "interior_arvore": {
+      "min_level": 5,
+      "max_level": 8,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "topo_arvore": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "raízes_arvore": {
+      "min_level": 5,
+      "max_level": 8,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost"]
+    },
+    "câmara_raízes": {
+      "min_level": 7,
+      "max_level": 12,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp"]
+    },
+    "toca_urso": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": true,
+      "monsters": ["troll"]
+    },
+    "toca_profunda": {
+      "min_level": 8,
+      "max_level": 12,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "orc_warrior"]
+    },
+    "montanha_leste": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": false,
+      "monsters": ["wolf"]
+    },
+    "montanha_norte": {
+      "min_level": 4,
+      "max_level": 7,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "passagem_neve": {
+      "min_level": 5,
+      "max_level": 8,
+      "aggressive_monsters": true,
+      "monsters": ["troll"]
+    },
+    "pico_gelo": {
+      "min_level": 7,
+      "max_level": 11,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "orc_warrior"]
+    },
+    "caverna_gelo": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "ghost"]
+    },
+    "câmara_gelo": {
+      "min_level": 10,
+      "max_level": 15,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "troll"]
+    },
+    "desfiladeiro": {
+      "min_level": 4,
+      "max_level": 7,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "desfiladeiro_profundo": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost"]
+    },
+    "caverna_rochosa": {
+      "min_level": 5,
+      "max_level": 9,
+      "aggressive_monsters": true,
+      "monsters": ["orc", "troll"]
+    },
+    "sala_minerais": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "ponte_suspensa": {
+      "min_level": 5,
+      "max_level": 8,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "plateau": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "templo_vento": {
+      "min_level": 7,
+      "max_level": 12,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "interior_templo_vento": {
+      "min_level": 8,
+      "max_level": 13,
+      "aggressive_monsters": true,
+      "monsters": ["wisp", "ghost"]
+    },
+    "altar_vento": {
+      "min_level": 10,
+      "max_level": 15,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp", "dragon_whelp"]
+    },
+    "cidade_norte": {
+      "min_level": 1,
+      "max_level": 3,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "cidade_leste": {
+      "min_level": 1,
+      "max_level": 3,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "paredes_cidade": {
+      "min_level": 2,
+      "max_level": 4,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "topo_muralha": {
+      "min_level": 2,
+      "max_level": 4,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "portão_norte": {
+      "min_level": 1,
+      "max_level": 3,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "estrada_norte": {
+      "min_level": 2,
+      "max_level": 5,
+      "aggressive_monsters": false,
+      "monsters": ["goblin"]
+    },
+    "encruzilhada": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "acampamento": {
+      "min_level": 2,
+      "max_level": 4,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "colina": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "topo_colina": {
+      "min_level": 3,
+      "max_level": 6,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "vale_sombrio": {
+      "min_level": 4,
+      "max_level": 8,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "skeleton"]
+    },
+    "vale_profundo": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "skeleton", "wisp"]
+    },
+    "caverna_escuridão": {
+      "min_level": 8,
+      "max_level": 12,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "skeleton", "wisp"]
+    },
+    "câmara_escuridão": {
+      "min_level": 10,
+      "max_level": 18,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "skeleton", "dragon_whelp"]
+    },
+    "floresta_escura": {
+      "min_level": 5,
+      "max_level": 9,
+      "aggressive_monsters": true,
+      "monsters": ["ent", "orc", "troll"]
+    },
+    "floresta_negra": {
+      "min_level": 8,
+      "max_level": 12,
+      "aggressive_monsters": true,
+      "monsters": ["ent", "troll", "orc_warrior"]
+    },
+    "torre_negra": {
+      "min_level": 10,
+      "max_level": 15,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp"]
+    },
+    "torre_negra_entrada": {
+      "min_level": 10,
+      "max_level": 15,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost"]
+    },
+    "torre_negra_andar1": {
+      "min_level": 12,
+      "max_level": 18,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp", "skeleton"]
+    },
+    "torre_negra_andar2": {
+      "min_level": 15,
+      "max_level": 22,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp", "dragon_whelp"]
+    },
+    "torre_negra_top": {
+      "min_level": 20,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "ghost", "troll"]
+    },
+    "pântano_escuro": {
+      "min_level": 6,
+      "max_level": 10,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk", "spider"]
+    },
+    "pântano_veneno": {
+      "min_level": 8,
+      "max_level": 12,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk", "spider", "troll"]
+    },
+    "ilha_veneno": {
+      "min_level": 10,
+      "max_level": 15,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk", "dragon_whelp"]
+    },
+    "pântano_profundo_escuro": {
+      "min_level": 12,
+      "max_level": 16,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk", "troll", "dragon_whelp"]
+    },
+    "cidade_ruínas": {
+      "min_level": 16,
+      "max_level": 20,
+      "aggressive_monsters": false,
+      "monsters": ["skeleton", "ghost"]
+    },
+    "mercado_ruínas": {
+      "min_level": 16,
+      "max_level": 20,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "templo_ruínas": {
+      "min_level": 17,
+      "max_level": 21,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp", "skeleton"]
+    },
+    "câmara_templo": {
+      "min_level": 18,
+      "max_level": 22,
+      "aggressive_monsters": true,
+      "monsters": ["wisp", "ghost", "dragon_whelp"]
+    },
+    "castelo_destruído": {
+      "min_level": 17,
+      "max_level": 21,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost", "orc_warrior"]
+    },
+    "torre_castelo": {
+      "min_level": 21,
+      "max_level": 25,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp", "dragon_whelp"]
+    },
+    "topo_torre_castelo": {
+      "min_level": 26,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "troll", "ghost"]
+    },
+    "masmorras_castelo": {
+      "min_level": 20,
+      "max_level": 24,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost", "troll"]
+    },
+    "célula_profunda": {
+      "min_level": 27,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "dragon_whelp", "troll"]
+    },
+    "salão_principal": {
+      "min_level": 19,
+      "max_level": 23,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "orc_warrior"]
+    },
+    "biblioteca_castelo": {
+      "min_level": 22,
+      "max_level": 26,
+      "aggressive_monsters": false,
+      "monsters": ["wisp"]
+    },
+    "deserto": {
+      "min_level": 16,
+      "max_level": 20,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk", "troll"]
+    },
+    "oásis": {
+      "min_level": 16,
+      "max_level": 20,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "acampamento_caravana": {
+      "min_level": 16,
+      "max_level": 20,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "ruínas_deserto": {
+      "min_level": 18,
+      "max_level": 22,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost"]
+    },
+    "pirâmide": {
+      "min_level": 19,
+      "max_level": 23,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost"]
+    },
+    "interior_pirâmide": {
+      "min_level": 20,
+      "max_level": 24,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "ghost", "mummy"]
+    },
+    "câmara_real": {
+      "min_level": 22,
+      "max_level": 26,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "skeleton", "mummy"]
+    },
+    "cripta_pirâmide": {
+      "min_level": 23,
+      "max_level": 27,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "dragon_whelp", "mummy"]
+    },
+    "túmulo_faraó": {
+      "min_level": 21,
+      "max_level": 25,
+      "aggressive_monsters": true,
+      "monsters": ["mummy", "skeleton"]
+    },
+    "interior_túmulo": {
+      "min_level": 22,
+      "max_level": 26,
+      "aggressive_monsters": true,
+      "monsters": ["mummy", "ghost", "skeleton"]
+    },
+    "câmara_faraó": {
+      "min_level": 24,
+      "max_level": 28,
+      "aggressive_monsters": true,
+      "monsters": ["mummy", "dragon_whelp", "ghost"]
+    },
+    "dunas": {
+      "min_level": 17,
+      "max_level": 21,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk", "troll"]
+    },
+    "dunas_altas": {
+      "min_level": 19,
+      "max_level": 23,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "basilisk"]
+    },
+    "oásis_oculto": {
+      "min_level": 20,
+      "max_level": 24,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "tempestade_areia": {
+      "min_level": 18,
+      "max_level": 22,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "basilisk"]
+    },
+    "cidade_perdida": {
+      "min_level": 20,
+      "max_level": 24,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "mummy", "ghost"]
+    },
+    "palácio_perdido": {
+      "min_level": 22,
+      "max_level": 26,
+      "aggressive_monsters": true,
+      "monsters": ["skeleton", "mummy"]
+    },
+    "interior_palácio": {
+      "min_level": 23,
+      "max_level": 27,
+      "aggressive_monsters": true,
+      "monsters": ["mummy", "ghost", "skeleton"]
+    },
+    "trono_real": {
+      "min_level": 28,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["mummy", "dragon_whelp", "ghost"]
+    },
+    "mercado_perdido": {
+      "min_level": 20,
+      "max_level": 24,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "oásis_abandonado": {
+      "min_level": 17,
+      "max_level": 21,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "caverna_deserto": {
+      "min_level": 19,
+      "max_level": 23,
+      "aggressive_monsters": true,
+      "monsters": ["basilisk", "troll"]
+    },
+    "câmara_cristal": {
+      "min_level": 29,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "wisp", "ghost"]
+    },
+    "floresta_proibida": {
+      "min_level": 18,
+      "max_level": 22,
+      "aggressive_monsters": true,
+      "monsters": ["ent", "troll", "orc_warrior"]
+    },
+    "coração_floresta": {
+      "min_level": 21,
+      "max_level": 25,
+      "aggressive_monsters": true,
+      "monsters": ["ent", "wisp", "dragon_whelp"]
+    },
+    "árvore_mundo": {
+      "min_level": 23,
+      "max_level": 27,
+      "aggressive_monsters": false,
+      "monsters": ["ent"]
+    },
+    "interior_árvore_mundo": {
+      "min_level": 24,
+      "max_level": 28,
+      "aggressive_monsters": true,
+      "monsters": ["wisp", "ghost"]
+    },
+    "copa_árvore_mundo": {
+      "min_level": 27,
+      "max_level": 30,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "clareira_proibida": {
+      "min_level": 19,
+      "max_level": 23,
+      "aggressive_monsters": false,
+      "monsters": ["wisp"]
+    },
+    "altar_antigo": {
+      "min_level": 22,
+      "max_level": 26,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "templo_elfico": {
+      "min_level": 20,
+      "max_level": 24,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "interior_templo_elfico": {
+      "min_level": 21,
+      "max_level": 25,
+      "aggressive_monsters": false,
+      "monsters": ["wisp"]
+    },
+    "câmara_elfica": {
+      "min_level": 26,
+      "max_level": 30,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "montanha_gélida": {
+      "min_level": 19,
+      "max_level": 23,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "orc_warrior"]
+    },
+    "pico_gélido": {
+      "min_level": 22,
+      "max_level": 26,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "dragon_whelp"]
+    },
+    "câmara_gelo_eterno": {
+      "min_level": 28,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "troll", "ghost"]
+    },
+    "glaciar": {
+      "min_level": 21,
+      "max_level": 25,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "ghost"]
+    },
+    "fenda_profunda": {
+      "min_level": 23,
+      "max_level": 27,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "ghost", "dragon_whelp"]
+    },
+    "abismo_gelo": {
+      "min_level": 25,
+      "max_level": 29,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "dragon_whelp", "troll"]
+    },
+    "câmara_anciã": {
+      "min_level": 29,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "ghost"]
+    },
+    "caverna_gelo_eterno": {
+      "min_level": 20,
+      "max_level": 24,
+      "aggressive_monsters": true,
+      "monsters": ["troll", "ghost"]
+    },
+    "santuario_gelo": {
+      "min_level": 27,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "ghost", "troll"]
+    },
+    "plano_sombrio": {
+      "min_level": 24,
+      "max_level": 28,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp", "skeleton"]
+    },
+    "cidade_sombria": {
+      "min_level": 25,
+      "max_level": 29,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "skeleton", "wisp"]
+    },
+    "mercado_sombrio": {
+      "min_level": 25,
+      "max_level": 29,
+      "aggressive_monsters": false,
+      "monsters": []
+    },
+    "palácio_sombrio": {
+      "min_level": 27,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp"]
+    },
+    "trono_sombrio": {
+      "min_level": 30,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "ghost", "wisp"]
+    },
+    "torre_sombria": {
+      "min_level": 26,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp", "dragon_whelp"]
+    },
+    "topo_torre_sombria": {
+      "min_level": 29,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "ghost"]
+    },
+    "abismo_sombrio": {
+      "min_level": 28,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["ghost", "wisp", "dragon_whelp"]
+    },
+    "câmara_vazio": {
+      "min_level": 30,
+      "max_level": 30,
+      "aggressive_monsters": true,
+      "monsters": ["dragon_whelp", "ghost", "wisp"]
+    }
+  },
+  "level_progression": {
+    "1-5": {
+      "description": "Áreas Iniciais",
+      "rooms": ["central", "cidade", "praia", "floresta", "montanha", "porto_pequeno", "cabana_pescador", "distrito_mercadores", "alquimista", "ferraria"]
+    },
+    "6-10": {
+      "description": "Áreas Intermediárias",
+      "rooms": ["pantano", "ruinas", "bosque_elfico", "templo_antigo", "catacumbas", "sala_arcana", "torre_abandonada", "lago_cristalino", "cachoeira_oculta"]
+    },
+    "11-15": {
+      "description": "Áreas Avançadas",
+      "rooms": ["pantano_profundo", "ilha_pantano", "caverna_profunda", "pico_montanha", "topo_torre", "vale_escondido", "mirante_estrelas"]
+    },
+    "16-20": {
+      "description": "Áreas Épicas",
+      "rooms": ["cidade_ruínas", "castelo_destruído", "deserto", "oásis", "ruínas_deserto", "pirâmide", "dunas", "cidade_perdida", "floresta_proibida", "montanha_gélida"]
+    },
+    "21-25": {
+      "description": "Áreas Lendárias",
+      "rooms": ["torre_castelo", "masmorras_castelo", "biblioteca_castelo", "cripta_pirâmide", "câmara_faraó", "palácio_perdido", "coração_floresta", "árvore_mundo", "glaciar", "plano_sombrio"]
+    },
+    "26-30": {
+      "description": "Áreas Míticas",
+      "rooms": ["topo_torre_castelo", "célula_profunda", "trono_real", "câmara_cristal", "copa_árvore_mundo", "câmara_elfica", "câmara_gelo_eterno", "câmara_anciã", "santuario_gelo", "cidade_sombria", "palácio_sombrio", "trono_sombrio", "câmara_vazio"]
+    }
+  }
+}
+

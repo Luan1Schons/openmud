@@ -1,0 +1,341 @@
+{
+  "dungeons": [
+    {
+      "id": "dungeon_floresta",
+      "name": "Caverna da Floresta Sombria",
+      "description": "Uma entrada escura e misteriosa na floresta, coberta por raízes e musgo. O ar dentro parece mais pesado, e você ouve ecos distantes.",
+      "entry_room": "floresta",
+      "entry_direction": "entrar",
+      "entry_command": "entrar caverna",
+      "rooms": [
+        {
+          "id": "dungeon_floresta_entrada",
+          "name": "Entrada da Caverna",
+          "description": "A entrada da caverna é escura e úmida. Raízes pendem do teto e água goteja das paredes. Você pode ver um corredor estreito adiante.",
+          "exits": {
+            "norte": "dungeon_floresta_corredor1",
+            "sair": "floresta"
+          },
+          "monsters": ["goblin", "goblin"],
+          "items": ["herb"],
+          "spawn_chance": 0.7,
+          "respawn_time": {
+            "min": 300,
+            "max": 600
+          },
+          "monster_respawns": {
+            "goblin": {
+              "min": 300,
+              "max": 600
+            }
+          }
+        },
+        {
+          "id": "dungeon_floresta_corredor1",
+          "name": "Corredor Escuro",
+          "description": "Um corredor estreito e escuro. A única luz vem de pequenas fendas no teto. Você ouve passos distantes.",
+          "exits": {
+            "norte": "dungeon_floresta_sala1",
+            "sul": "dungeon_floresta_entrada",
+            "leste": "dungeon_floresta_corredor2"
+          },
+          "monsters": ["goblin", "wolf"],
+          "items": ["herb"],
+          "spawn_chance": 0.6
+        },
+        {
+          "id": "dungeon_floresta_corredor2",
+          "name": "Passagem Lateral",
+          "description": "Uma passagem lateral que parece levar mais fundo na caverna. O ar está mais frio aqui.",
+          "exits": {
+            "oeste": "dungeon_floresta_corredor1",
+            "norte": "dungeon_floresta_sala2"
+          },
+          "monsters": ["wolf", "spider"],
+          "items": ["herb", "mushroom"],
+          "spawn_chance": 0.5
+        },
+        {
+          "id": "dungeon_floresta_sala1",
+          "name": "Sala dos Eco",
+          "description": "Uma sala ampla com ecos que ressoam pelas paredes. No centro há uma poça de água cristalina.",
+          "exits": {
+            "sul": "dungeon_floresta_corredor1",
+            "leste": "dungeon_floresta_sala2"
+          },
+          "monsters": ["goblin", "goblin", "orc"],
+          "items": ["herb", "mushroom", "rare_herb"],
+          "spawn_chance": 0.8
+        },
+        {
+          "id": "dungeon_floresta_sala2",
+          "name": "Câmara dos Fungos",
+          "description": "Uma câmara onde fungos bioluminescentes crescem nas paredes, criando uma luz azul suave. O ar cheira a terra e mofo.",
+          "exits": {
+            "oeste": "dungeon_floresta_sala1",
+            "sul": "dungeon_floresta_corredor2",
+            "norte": "dungeon_floresta_boss"
+          },
+          "monsters": ["spider", "spider", "orc"],
+          "items": ["mushroom", "mushroom", "rare_herb"],
+          "spawn_chance": 0.7
+        },
+        {
+          "id": "dungeon_floresta_boss",
+          "name": "Câmara do Guardião",
+          "description": "Uma câmara final onde um guardião antigo protege os tesouros mais raros. O ar está carregado de energia mágica.",
+          "exits": {
+            "sul": "dungeon_floresta_sala2"
+          },
+          "monsters": ["orc", "orc_warrior"],
+          "items": ["rare_herb", "rare_herb", "rare_mushroom"],
+          "spawn_chance": 1.0,
+          "is_boss_room": true
+        }
+      ]
+    },
+    {
+      "id": "dungeon_catacumbas",
+      "name": "Catacumbas Antigas",
+      "description": "Uma entrada secreta leva para baixo das ruínas. O ar está pesado e mágico.",
+      "entry_room": "ruinas",
+      "entry_direction": "baixo",
+      "entry_command": "baixo",
+      "rooms": [
+        {
+          "id": "catacumbas_entrada",
+          "name": "Entrada das Catacumbas",
+          "description": "Túneis antigos com túmulos alinhados nas paredes. O ar é pesado e mágico.",
+          "exits": {
+            "sul": "catacumbas_sala1",
+            "cima": "ruinas"
+          },
+          "monsters": ["skeleton", "skeleton"],
+          "items": ["bone"],
+          "spawn_chance": 0.8,
+          "monster_respawns": {
+            "skeleton": {
+              "min": 300,
+              "max": 600
+            }
+          },
+          "aggressive_monsters": true,
+          "min_level": 2,
+          "max_level": 5
+        },
+        {
+          "id": "catacumbas_sala1",
+          "name": "Sala dos Mortos",
+          "description": "Uma sala maior com sarcófagos antigos. Alguns estão abertos.",
+          "exits": {
+            "norte": "catacumbas_entrada",
+            "sul": "sala_arcana",
+            "leste": "catacumbas_corredor1"
+          },
+          "monsters": ["skeleton", "ghost", "skeleton"],
+          "items": ["bone", "ectoplasm"],
+          "spawn_chance": 0.7,
+          "aggressive_monsters": true,
+          "min_level": 3,
+          "max_level": 6
+        },
+        {
+          "id": "catacumbas_corredor1",
+          "name": "Corredor Escuro",
+          "description": "Um corredor escuro com escritos antigos nas paredes.",
+          "exits": {
+            "oeste": "catacumbas_sala1",
+            "leste": "catacumbas_boss"
+          },
+          "monsters": ["ghost", "ghost"],
+          "items": ["ectoplasm", "soul_fragment"],
+          "spawn_chance": 0.6,
+          "aggressive_monsters": true,
+          "min_level": 4,
+          "max_level": 7
+        },
+        {
+          "id": "catacumbas_boss",
+          "name": "Câmara do Lich",
+          "description": "Uma câmara final onde um lich antigo guarda tesouros proibidos.",
+          "exits": {
+            "oeste": "catacumbas_corredor1"
+          },
+          "monsters": ["ghost", "skeleton", "ghost"],
+          "items": ["soul_fragment", "soul_fragment", "crystal_magic"],
+          "spawn_chance": 1.0,
+          "is_boss_room": true,
+          "aggressive_monsters": true,
+          "min_level": 6,
+          "max_level": 10
+        }
+      ]
+    },
+    {
+      "id": "dungeon_torre",
+      "name": "Torre Maldita",
+      "description": "A torre abandonada parece estar amaldiçoada. Ventos sinistros sopram pelas janelas quebradas.",
+      "entry_room": "torre_abandonada",
+      "entry_direction": "cima",
+      "entry_command": "cima",
+      "rooms": [
+        {
+          "id": "torre_andar2",
+          "name": "Segundo Andar",
+          "description": "Um andar intermediário com escadas quebradas. Livros antigos estão espalhados pelo chão.",
+          "exits": {
+            "cima": "torre_andar3",
+            "baixo": "torre_abandonada"
+          },
+          "monsters": ["wisp", "wisp"],
+          "items": ["essence_light"],
+          "spawn_chance": 0.6,
+          "aggressive_monsters": true,
+          "min_level": 2,
+          "max_level": 4
+        },
+        {
+          "id": "torre_andar3",
+          "name": "Terceiro Andar",
+          "description": "Um andar com estantes cheias de grimórios antigos. O ar cheira a magia.",
+          "exits": {
+            "cima": "topo_torre",
+            "baixo": "torre_andar2"
+          },
+          "monsters": ["wisp", "ghost"],
+          "items": ["essence_light", "book_magic"],
+          "spawn_chance": 0.7,
+          "aggressive_monsters": true,
+          "min_level": 3,
+          "max_level": 6
+        },
+        {
+          "id": "torre_boss",
+          "name": "Câmara do Mago",
+          "description": "O topo da torre onde um mago antigo deixou seus experimentos. O ar pulsa com energia arcana.",
+          "exits": {
+            "baixo": "torre_andar3"
+          },
+          "monsters": ["ghost", "ghost", "wisp"],
+          "items": ["crystal_magic", "star_dust"],
+          "spawn_chance": 1.0,
+          "is_boss_room": true,
+          "aggressive_monsters": true,
+          "min_level": 5,
+          "max_level": 8
+        }
+      ]
+    },
+    {
+      "id": "dungeon_pantano",
+      "name": "Toca do Pântano",
+      "description": "Uma toca escura no pântano profundo. O cheiro de podridão é insuportável.",
+      "entry_room": "pantano_profundo",
+      "entry_direction": "entrar",
+      "entry_command": "entrar toca",
+      "rooms": [
+        {
+          "id": "pantano_toca_entrada",
+          "name": "Entrada da Toca",
+          "description": "Uma entrada lamacenta com água estagnada. Algo se move na escuridão.",
+          "exits": {
+            "norte": "pantano_toca_sala1",
+            "sair": "pantano_profundo"
+          },
+          "monsters": ["slime", "spider"],
+          "items": ["herb"],
+          "spawn_chance": 0.7,
+          "aggressive_monsters": true,
+          "min_level": 1,
+          "max_level": 3
+        },
+        {
+          "id": "pantano_toca_sala1",
+          "name": "Sala Lamacenta",
+          "description": "Uma sala cheia de lama e água estagnada. O ar está pesado.",
+          "exits": {
+            "norte": "pantano_toca_sala2",
+            "sul": "pantano_toca_entrada"
+          },
+          "monsters": ["spider", "spider", "slime"],
+          "items": ["herb", "venom_sac"],
+          "spawn_chance": 0.6,
+          "aggressive_monsters": true,
+          "min_level": 2,
+          "max_level": 4
+        },
+        {
+          "id": "pantano_toca_sala2",
+          "name": "Câmara do Basilisco",
+          "description": "Uma câmara onde um basilisco antigo faz sua toca.",
+          "exits": {
+            "sul": "pantano_toca_sala1"
+          },
+          "monsters": ["basilisk", "spider"],
+          "items": ["basilisk_scale", "venom_sac", "rare_gem"],
+          "spawn_chance": 1.0,
+          "is_boss_room": true,
+          "aggressive_monsters": true,
+          "min_level": 7,
+          "max_level": 10
+        }
+      ]
+    },
+    {
+      "id": "dungeon_caverna_profunda",
+      "name": "Caverna dos Dragões",
+      "description": "Uma caverna profunda onde dragões jovens fazem seus ninhos. O calor é intenso.",
+      "entry_room": "caverna_profunda",
+      "entry_direction": "entrar",
+      "entry_command": "entrar caverna dragão",
+      "rooms": [
+        {
+          "id": "caverna_dragao_entrada",
+          "name": "Entrada da Caverna",
+          "description": "Cristais brilham nas paredes. O calor é intenso e você ouve roncos distantes.",
+          "exits": {
+            "norte": "caverna_dragao_sala1",
+            "sair": "caverna_profunda"
+          },
+          "monsters": ["troll", "troll"],
+          "items": ["troll_hide"],
+          "spawn_chance": 0.8,
+          "aggressive_monsters": true,
+          "min_level": 6,
+          "max_level": 10
+        },
+        {
+          "id": "caverna_dragao_sala1",
+          "name": "Sala dos Cristais",
+          "description": "Uma sala enorme com cristais gigantes que refletem luz mágica.",
+          "exits": {
+            "norte": "caverna_dragao_sala2",
+            "sul": "caverna_dragao_entrada"
+          },
+          "monsters": ["troll", "orc_warrior"],
+          "items": ["crystal_magic", "troll_hide"],
+          "spawn_chance": 0.7,
+          "aggressive_monsters": true,
+          "min_level": 8,
+          "max_level": 12
+        },
+        {
+          "id": "caverna_dragao_sala2",
+          "name": "Ninho do Dragão",
+          "description": "O ninho do dragão. Ossos e tesouros estão espalhados pelo chão.",
+          "exits": {
+            "sul": "caverna_dragao_sala1"
+          },
+          "monsters": ["dragon_whelp", "dragon_whelp"],
+          "items": ["dragon_scale", "dragon_fang", "rare_gem"],
+          "spawn_chance": 1.0,
+          "is_boss_room": true,
+          "aggressive_monsters": true,
+          "min_level": 10,
+          "max_level": 15
+        }
+      ]
+    }
+  ]
+}
+
