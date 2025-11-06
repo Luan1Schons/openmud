@@ -39,10 +39,10 @@ ai = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/terminal_game"
-Documentation = "https://github.com/yourusername/terminal_game#readme"
-Repository = "https://github.com/yourusername/terminal_game"
-Issues = "https://github.com/yourusername/terminal_game/issues"
+Homepage = "https://github.com/Luan1Schons/openmud.git"
+Documentation = "https://github.com/Luan1Schons/openmud.git#readme"
+Repository = "https://github.com/Luan1Schons/openmud.git"
+Issues = "https://github.com/Luan1Schons/openmud.git/issues"
 
 # Entry point removido - execute diretamente: python3 server.py
 # [project.scripts]

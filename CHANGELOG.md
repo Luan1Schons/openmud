@@ -40,6 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sistema básico de monstros
 - Sistema básico de quests
 
-[Unreleased]: https://github.com/yourusername/terminal_game/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/terminal_game/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Luan1Schons/openmud.git/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Luan1Schons/openmud.git/releases/tag/v0.1.0
 
