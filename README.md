@@ -154,9 +154,15 @@ telnet openmud-production.up.railway.app 4000
 nc openmud-production.up.railway.app 4000
 ```
 
+> **Nota Importante sobre Railway:** O Railway não expõe portas TCP diretamente por padrão. Para conexões TCP (Telnet/TinTin++), você precisa:
+> - Configurar um **TCP Proxy** no Railway, OU
+> - Usar um **VPS** (recomendado para MUDs) que suporte conexões TCP diretas
+> 
+> Veja [DEPLOY_RAILWAY.md](./DEPLOY_RAILWAY.md) para mais detalhes sobre deploy no Railway.
+
 > **Nota:** O servidor já está configurado para aceitar conexões externas. Certifique-se de que:
-> - A porta 4000 (ou a porta configurada) está aberta no firewall
-> - O serviço de cloud (Railway, etc.) está configurado para usar a porta correta
+> - A porta está aberta no firewall
+> - O serviço de cloud está configurado corretamente para TCP
 
 Para mais detalhes sobre conexão, consulte a [documentação completa](./docs/CONECTAR.md).
 
