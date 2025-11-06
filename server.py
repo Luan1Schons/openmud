@@ -378,12 +378,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
                 except asyncio.TimeoutError:
                     pass
                 
-                # Marca como tendo visto a lore
-                # Atualiza também no objeto player
-                if player:
-                    player.stats['has_seen_lore'] = True
-                
-                # Salva no banco de dados
+                # Marca como tendo visto a lore no banco de dados
                 current_player_data = database.get_player(player_name)
                 if current_player_data:
                     current_stats = current_player_data.get('stats', {}).copy()
