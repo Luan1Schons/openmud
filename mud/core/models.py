@@ -3,7 +3,7 @@ Modelos de dados do MUD
 """
 
 from dataclasses import dataclass, asdict
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Tuple
 import asyncio
 
 @dataclass
@@ -308,9 +308,11 @@ class Player:
     def is_alive(self) -> bool:
         return self.current_hp > 0
     
-    def take_damage(self, damage: int) -> int:
-        """Aplica dano e retorna o dano real recebido"""
-        actual_damage = max(1, damage - self.defense)
+    def take_damage(self, damage: int, defense: Optional[int] = None) -> int:
+        """Aplica dano e retorna o dano real recebido. Se defense for None, usa self.defense"""
+        if defense is None:
+            defense = self.defense
+        actual_damage = max(1, damage - defense)
         self.current_hp = max(0, self.current_hp - actual_damage)
         return actual_damage
     
@@ -410,3 +412,77 @@ class Player:
     
     def get_address(self):
         return self.writer.get_extra_info('peername')
+    
+    def get_total_attack(self, game_data=None) -> int:
+        """Retorna o ataque total (base + equipamento)"""
+        total = self.attack
+        if game_data and self.equipment:
+            for slot, item_id in self.equipment.items():
+                if item_id:  # Ignora slots vazios
+                    item = game_data.get_item(item_id) if hasattr(game_data, 'get_item') else None
+                    if item and item.stats:
+                        total += item.stats.get('attack', 0)
+        return total
+    
+    def get_total_defense(self, game_data=None) -> int:
+        """Retorna a defesa total (base + equipamento)"""
+        total = self.defense
+        if game_data and self.equipment:
+            for slot, item_id in self.equipment.items():
+                if item_id:  # Ignora slots vazios
+                    item = game_data.get_item(item_id) if hasattr(game_data, 'get_item') else None
+                    if item and item.stats:
+                        total += item.stats.get('defense', 0)
+        return total
+    
+    def equip_item(self, item_id: str, game_data=None) -> Tuple[bool, str]:
+        """
+        Equipa um item. Retorna (sucesso, mensagem)
+        Slots: weapon, armor, accessory
+        """
+        if item_id not in self.inventory:
+            return False, "Item não está no inventário"
+        
+        if game_data:
+            item = game_data.get_item(item_id)
+            if not item:
+                return False, "Item não encontrado"
+            
+            # Determina o slot baseado no tipo
+            if item.type == 'weapon':
+                slot = 'weapon'
+            elif item.type == 'armor':
+                slot = 'armor'
+            else:
+                return False, f"Item do tipo '{item.type}' não pode ser equipado"
+            
+            # Se já tem algo equipado nesse slot, desequipa primeiro
+            if slot in self.equipment and self.equipment[slot]:
+                old_item_id = self.equipment[slot]
+                # Não remove do inventário, apenas desequipa
+            
+            # Equipa o novo item
+            self.equipment[slot] = item_id
+            return True, f"{item.name} equipado em {slot}"
+        
+        return False, "Sistema de dados do jogo não disponível"
+    
+    def unequip_item(self, slot: str) -> Tuple[bool, str]:
+        """
+        Desequipa um item de um slot. Retorna (sucesso, mensagem)
+        """
+        if slot not in self.equipment or not self.equipment.get(slot):
+            return False, f"Nada equipado em {slot}"
+        
+        item_id = self.equipment[slot]
+        # Remove o slot do dicionário
+        del self.equipment[slot]
+        return True, f"Item desequipado de {slot}"
+    
+    def get_equipped_item(self, slot: str) -> Optional[str]:
+        """Retorna o ID do item equipado em um slot, ou None"""
+        return self.equipment.get(slot)
+    
+    def is_item_equipped(self, item_id: str) -> bool:
+        """Verifica se um item está equipado"""
+        return item_id in [v for v in self.equipment.values() if v]

@@ -5,6 +5,7 @@ Gerenciamento de banco de dados SQL para persistência de jogadores
 import sqlite3
 import json
 import hashlib
+import os
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 from pathlib import Path
@@ -12,8 +13,28 @@ from pathlib import Path
 class Database:
     """Gerencia conexão e operações do banco de dados"""
     
-    def __init__(self, db_path: str = "mud.db"):
+    def __init__(self, db_path: str = None):
+        # Se não especificado, detecta automaticamente o caminho
+        if db_path is None:
+            # Verifica se está em produção (Railway) - diretório /database existe
+            if os.path.exists('/database') and os.path.isdir('/database'):
+                # Produção: usa /database/mud.db
+                db_path = '/database/mud.db'
+                # Garante que o diretório existe (já deve existir, mas por segurança)
+                os.makedirs('/database', exist_ok=True)
+            else:
+                # Desenvolvimento: usa caminho relativo
+                db_path = "mud.db"
+        
         self.db_path = db_path
+        # Garante que o diretório do banco existe
+        db_dir = os.path.dirname(os.path.abspath(self.db_path))
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir, exist_ok=True)
+        
+        # Log do caminho usado (útil para debug)
+        print(f"[Database] Usando banco de dados: {os.path.abspath(self.db_path)}")
+        
         self._init_database()
     
     def _init_database(self):

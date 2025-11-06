@@ -13,9 +13,10 @@ class CombatSystem:
     """Sistema de combate entre jogador e monstros"""
     
     @staticmethod
-    async def attack_monster(player: Player, monster: Monster, send_message_func) -> bool:
+    async def attack_monster(player: Player, monster: Monster, send_message_func, game_data=None) -> bool:
         """
         Jogador ataca monstro. Retorna True se monstro morreu
+        game_data: opcional, usado para calcular stats totais com equipamento
         """
         # Animação de ataque
         animation = get_attack_animation()
@@ -23,8 +24,9 @@ class CombatSystem:
             await send_message_func(f"\r{ANSI.BRIGHT_GREEN}{frame}{ANSI.RESET}")
             await asyncio.sleep(0.1)
         
-        # Calcula dano do jogador (com variação)
-        player_damage = player.attack + random.randint(-2, 2)
+        # Calcula dano do jogador usando ataque total (com equipamento)
+        total_attack = player.get_total_attack(game_data) if game_data else player.attack
+        player_damage = total_attack + random.randint(-2, 2)
         actual_damage = monster.take_damage(player_damage, "physical")
         
         level_info = f" [Nível {monster.level}]" if monster.level > 1 else ""
@@ -46,7 +48,9 @@ class CombatSystem:
         await asyncio.sleep(0.3)  # Pequena pausa para melhor visualização
         
         monster_damage = monster.get_attack_damage()
-        actual_damage = player.take_damage(monster_damage)
+        # Usa defesa total (com equipamento) para reduzir dano
+        total_defense = player.get_total_defense(game_data) if game_data else player.defense
+        actual_damage = player.take_damage(monster_damage, total_defense)
         
         weapon_info = ""
         if monster.weapon:
@@ -88,10 +92,11 @@ class CombatSystem:
         return monster.get_gold_drop()
     
     @staticmethod
-    async def monster_cast_spell(monster: Monster, player: Player, spell_id: str, spell_system, send_message_func) -> bool:
+    async def monster_cast_spell(monster: Monster, player: Player, spell_id: str, spell_system, send_message_func, game_data=None) -> bool:
         """
         Monstro usa uma magia. Retorna True se o jogador morreu.
         Inclui chance de falha (20% base para monstros).
+        game_data: opcional, usado para calcular defesa total com equipamento
         """
         spell = spell_system.get_spell(spell_id)
         if not spell:
@@ -110,8 +115,9 @@ class CombatSystem:
             spell, monster.level, monster.attack, 1, 1.0  # Monstros usam nível 1 da magia
         )
         
-        # Aplica dano ao jogador
-        actual_damage = player.take_damage(damage)
+        # Aplica dano ao jogador usando defesa total (com equipamento)
+        total_defense = player.get_total_defense(game_data) if game_data else player.defense
+        actual_damage = player.take_damage(damage, total_defense)
         
         damage_icon = "🔥" if spell.damage_type == "fire" else "❄" if spell.damage_type == "ice" else "⚡" if spell.damage_type == "lightning" else "✨"
         level_info = f" [Nível {monster.level}]" if monster.level > 1 else ""

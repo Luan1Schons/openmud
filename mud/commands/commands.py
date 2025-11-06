@@ -116,6 +116,9 @@ class CommandHandler:
             'equip_spell': (self.cmd_equip_spell, True, False),
             'desequipar': (self.cmd_unequip_spell, True, False),
             'unequip_spell': (self.cmd_unequip_spell, True, False),
+            'equip': (self.cmd_equip, True, False),
+            'unequip': (self.cmd_unequip, True, False),
+            'desequip': (self.cmd_unequip, True, False),
             'improve': (self.cmd_improve_spell, True, False),
             'melhorar': (self.cmd_improve_spell, True, False),
             'learn': (self.cmd_learn_spell, True, False),
@@ -784,7 +787,8 @@ class CommandHandler:
         # Usa o sistema de combate para o monstro atacar
         from mud.systems.combat import CombatSystem
         monster_damage = attacking_monster.get_attack_damage()
-        actual_damage = player.take_damage(monster_damage)
+        total_defense = player.get_total_defense(self.game_data)
+        actual_damage = player.take_damage(monster_damage, total_defense)
         
         weapon_info = ""
         if attacking_monster.weapon:
@@ -896,7 +900,8 @@ class CommandHandler:
         # Batalha
         result = await CombatSystem.attack_monster(
             player, monster_found, 
-            lambda msg: self.send_message(player, msg)
+            lambda msg: self.send_message(player, msg),
+            self.game_data
         )
         
         # Verifica se o jogador morreu
@@ -1018,8 +1023,41 @@ class CommandHandler:
         message += f"{format_stamina_bar(player.current_stamina, player.max_stamina)}\r\n"
         
         message += f"{ANSI.BRIGHT_YELLOW}Experiência:{ANSI.RESET} {player.experience}\r\n"
-        message += f"{ANSI.BRIGHT_CYAN}Ataque:{ANSI.RESET} {player.attack}\r\n"
-        message += f"{ANSI.BRIGHT_BLUE}Defesa:{ANSI.RESET} {player.defense}\r\n"
+        
+        # Stats com equipamento
+        total_attack = player.get_total_attack(self.game_data)
+        total_defense = player.get_total_defense(self.game_data)
+        
+        if total_attack > player.attack or total_defense > player.defense:
+            # Mostra stats base e total
+            attack_bonus = total_attack - player.attack
+            defense_bonus = total_defense - player.defense
+            message += f"{ANSI.BRIGHT_CYAN}Ataque:{ANSI.RESET} {player.attack}"
+            if attack_bonus > 0:
+                message += f" {ANSI.BRIGHT_GREEN}(+{attack_bonus} equipamento) = {total_attack}{ANSI.RESET}\r\n"
+            else:
+                message += "\r\n"
+            
+            message += f"{ANSI.BRIGHT_BLUE}Defesa:{ANSI.RESET} {player.defense}"
+            if defense_bonus > 0:
+                message += f" {ANSI.BRIGHT_GREEN}(+{defense_bonus} equipamento) = {total_defense}{ANSI.RESET}\r\n"
+            else:
+                message += "\r\n"
+        else:
+            message += f"{ANSI.BRIGHT_CYAN}Ataque:{ANSI.RESET} {total_attack}\r\n"
+            message += f"{ANSI.BRIGHT_BLUE}Defesa:{ANSI.RESET} {total_defense}\r\n"
+        
+        # Mostra equipamento
+        if player.equipment:
+            message += f"\r\n{ANSI.BOLD}Equipamento:{ANSI.RESET}\r\n"
+            for slot, item_id in player.equipment.items():
+                if item_id:
+                    item = self.game_data.get_item(item_id)
+                    if item:
+                        message += f"  {ANSI.BRIGHT_CYAN}{slot.capitalize()}:{ANSI.RESET} {item.name}\r\n"
+                    else:
+                        message += f"  {ANSI.BRIGHT_CYAN}{slot.capitalize()}:{ANSI.RESET} [Item não encontrado]\r\n"
+        
         message += f"{ANSI.BRIGHT_MAGENTA}Ouro:{ANSI.RESET} {player.gold}\r\n"
         await self.send_message(player, message)
     
@@ -1105,10 +1143,34 @@ class CommandHandler:
                 rarity_color = item.get_rarity_color()
                 rarity_text = f" {ANSI.BRIGHT_BLACK}[{item.rarity.upper()}]{ANSI.RESET}" if item.rarity != "common" else ""
                 type_text = f"{ANSI.BRIGHT_BLACK}({item.type}){ANSI.RESET}"
-                message += f"  {rarity_color}{item.name}{ANSI.RESET}{count_text}{rarity_text} {type_text}\r\n"
+                
+                # Verifica se está equipado
+                is_equipped = player.is_item_equipped(item_id)
+                equipped_text = f" {ANSI.BRIGHT_GREEN}[EQUIPADO]{ANSI.RESET}" if is_equipped else ""
+                
+                message += f"  {rarity_color}{item.name}{ANSI.RESET}{count_text}{rarity_text} {type_text}{equipped_text}\r\n"
                 message += f"    {ANSI.WHITE}{item.description}{ANSI.RESET}\r\n"
+                
+                # Mostra stats do item se for weapon ou armor
+                if item.type in ['weapon', 'armor'] and item.stats:
+                    stats_text = []
+                    if item.stats.get('attack', 0) > 0:
+                        stats_text.append(f"{ANSI.BRIGHT_CYAN}+{item.stats['attack']} Ataque{ANSI.RESET}")
+                    if item.stats.get('defense', 0) > 0:
+                        stats_text.append(f"{ANSI.BRIGHT_BLUE}+{item.stats['defense']} Defesa{ANSI.RESET}")
+                    if stats_text:
+                        message += f"    {ANSI.BRIGHT_GREEN}Stats: {', '.join(stats_text)}{ANSI.RESET}\r\n"
+                
                 if item.value > 0:
                     message += f"    {ANSI.BRIGHT_YELLOW}💰 Valor: {item.value} moedas{ANSI.RESET}\r\n"
+                
+                # Mostra comando para equipar/desequipar
+                if item.type in ['weapon', 'armor']:
+                    if is_equipped:
+                        message += f"    {ANSI.BRIGHT_CYAN}Use: unequip {item.name} para desequipar{ANSI.RESET}\r\n"
+                    else:
+                        message += f"    {ANSI.BRIGHT_CYAN}Use: equip {item.name} para equipar{ANSI.RESET}\r\n"
+                
                 message += "\r\n"
             else:
                 message += f"  {ANSI.YELLOW}[Item não encontrado: {item_id}]{ANSI.RESET} x{count}\r\n"
@@ -1363,6 +1425,175 @@ class CommandHandler:
             'spell_cooldowns': player.spell_cooldowns
         }
         self.database.update_player_stats(player.name, stats)
+    
+    async def cmd_equip(self, player: Player, item_name: str):
+        """Comando equip - equipa um item (weapon ou armor)"""
+        if not item_name:
+            await self.send_message(player, f"{ANSI.YELLOW}Equipar o quê? Use: equip <nome do item>{ANSI.RESET}")
+            return
+        
+        # Procura item no inventário
+        item_found = None
+        item_id_found = None
+        
+        for item_id in player.inventory:
+            item = self.game_data.get_item(item_id)
+            if item and item_name.lower() in item.name.lower():
+                item_found = item
+                item_id_found = item_id
+                break
+        
+        if not item_found:
+            await self.send_message(player, f"{ANSI.RED}Item '{item_name}' não está no seu inventário.{ANSI.RESET}")
+            return
+        
+        # Verifica se é um item equipável
+        if item_found.type not in ['weapon', 'armor']:
+            await self.send_message(player, f"{ANSI.YELLOW}Este item não pode ser equipado. Apenas armas e armaduras podem ser equipadas.{ANSI.RESET}")
+            return
+        
+        # Equipa o item
+        success, message = player.equip_item(item_id_found, self.game_data)
+        if success:
+            await self.send_message(player, f"{ANSI.BRIGHT_GREEN}{message}{ANSI.RESET}\r\n")
+            
+            # Mostra stats atualizados
+            total_attack = player.get_total_attack(self.game_data)
+            total_defense = player.get_total_defense(self.game_data)
+            await self.send_message(player, 
+                f"{ANSI.BRIGHT_CYAN}Ataque: {total_attack} | Defesa: {total_defense}{ANSI.RESET}\r\n")
+            
+            # Salva no banco
+            stats = {
+                'hp': player.current_hp,
+                'max_hp': player.max_hp,
+                'current_stamina': player.current_stamina,
+                'max_stamina': player.max_stamina,
+                'level': player.level,
+                'experience': player.experience,
+                'attack': player.attack,
+                'defense': player.defense,
+                'gold': player.gold,
+                'inventory': player.inventory,
+                'equipment': player.equipment,
+                'active_quests': player.active_quests,
+                'quest_progress': player.quest_progress,
+                'completed_quests': player.completed_quests,
+                'known_spells': player.known_spells,
+                'equipped_spells': player.equipped_spells,
+                'active_perks': player.active_perks,
+                'spell_cooldowns': player.spell_cooldowns
+            }
+            self.database.update_player_stats(player.name, stats)
+        else:
+            await self.send_message(player, f"{ANSI.RED}{message}{ANSI.RESET}")
+    
+    async def cmd_unequip(self, player: Player, item_name: str):
+        """Comando unequip - desequipa um item"""
+        if not item_name:
+            await self.send_message(player, f"{ANSI.YELLOW}Desequipar o quê? Use: unequip <nome do item> ou unequip <slot>{ANSI.RESET}")
+            return
+        
+        # Verifica se é um slot
+        slot_map = {
+            'weapon': 'weapon',
+            'arma': 'weapon',
+            'armor': 'armor',
+            'armadura': 'armor'
+        }
+        
+        slot = slot_map.get(item_name.lower())
+        if slot:
+            # Desequipa por slot
+            success, message = player.unequip_item(slot)
+            if success:
+                await self.send_message(player, f"{ANSI.BRIGHT_GREEN}{message}{ANSI.RESET}\r\n")
+                
+                # Mostra stats atualizados
+                total_attack = player.get_total_attack(self.game_data)
+                total_defense = player.get_total_defense(self.game_data)
+                await self.send_message(player, 
+                    f"{ANSI.BRIGHT_CYAN}Ataque: {total_attack} | Defesa: {total_defense}{ANSI.RESET}\r\n")
+                
+                # Salva no banco
+                stats = {
+                    'hp': player.current_hp,
+                    'max_hp': player.max_hp,
+                    'current_stamina': player.current_stamina,
+                    'max_stamina': player.max_stamina,
+                    'level': player.level,
+                    'experience': player.experience,
+                    'attack': player.attack,
+                    'defense': player.defense,
+                    'gold': player.gold,
+                    'inventory': player.inventory,
+                    'equipment': player.equipment,
+                    'active_quests': player.active_quests,
+                    'quest_progress': player.quest_progress,
+                    'completed_quests': player.completed_quests,
+                    'known_spells': player.known_spells,
+                    'equipped_spells': player.equipped_spells,
+                    'active_perks': player.active_perks,
+                    'spell_cooldowns': player.spell_cooldowns
+                }
+                self.database.update_player_stats(player.name, stats)
+            else:
+                await self.send_message(player, f"{ANSI.RED}{message}{ANSI.RESET}")
+            return
+        
+        # Procura item equipado
+        item_found = None
+        item_id_found = None
+        slot_found = None
+        
+        for slot, item_id in player.equipment.items():
+            if item_id:
+                item = self.game_data.get_item(item_id)
+                if item and item_name.lower() in item.name.lower():
+                    item_found = item
+                    item_id_found = item_id
+                    slot_found = slot
+                    break
+        
+        if not item_found:
+            await self.send_message(player, f"{ANSI.RED}Item '{item_name}' não está equipado.{ANSI.RESET}")
+            return
+        
+        # Desequipa o item
+        success, message = player.unequip_item(slot_found)
+        if success:
+            await self.send_message(player, f"{ANSI.BRIGHT_GREEN}{message}{ANSI.RESET}\r\n")
+            
+            # Mostra stats atualizados
+            total_attack = player.get_total_attack(self.game_data)
+            total_defense = player.get_total_defense(self.game_data)
+            await self.send_message(player, 
+                f"{ANSI.BRIGHT_CYAN}Ataque: {total_attack} | Defesa: {total_defense}{ANSI.RESET}\r\n")
+            
+            # Salva no banco
+            stats = {
+                'hp': player.current_hp,
+                'max_hp': player.max_hp,
+                'current_stamina': player.current_stamina,
+                'max_stamina': player.max_stamina,
+                'level': player.level,
+                'experience': player.experience,
+                'attack': player.attack,
+                'defense': player.defense,
+                'gold': player.gold,
+                'inventory': player.inventory,
+                'equipment': player.equipment,
+                'active_quests': player.active_quests,
+                'quest_progress': player.quest_progress,
+                'completed_quests': player.completed_quests,
+                'known_spells': player.known_spells,
+                'equipped_spells': player.equipped_spells,
+                'active_perks': player.active_perks,
+                'spell_cooldowns': player.spell_cooldowns
+            }
+            self.database.update_player_stats(player.name, stats)
+        else:
+            await self.send_message(player, f"{ANSI.RED}{message}{ANSI.RESET}")
     
     async def cmd_spells(self, player: Player):
         """Comando spells - mostra magias conhecidas e equipadas"""
@@ -1682,7 +1913,8 @@ class CommandHandler:
                 # Monstro ainda pode revidar mesmo se a magia falhar
                 await asyncio.sleep(0.3)
                 monster_damage = monster_found.get_attack_damage()
-                actual_damage = player.take_damage(monster_damage)
+                total_defense = player.get_total_defense(self.game_data)
+                actual_damage = player.take_damage(monster_damage, total_defense)
                 level_info = f" [Nível {monster_found.level}]" if monster_found.level > 1 else ""
                 weapon_info = ""
                 if monster_found.weapon:
@@ -1723,7 +1955,8 @@ class CommandHandler:
             if monster_found.is_alive():
                 await asyncio.sleep(0.3)
                 monster_damage = monster_found.get_attack_damage()
-                actual_damage = player.take_damage(monster_damage)
+                total_defense = player.get_total_defense(self.game_data)
+                actual_damage = player.take_damage(monster_damage, total_defense)
                 level_info = f" [Nível {monster_found.level}]" if monster_found.level > 1 else ""
                 weapon_info = ""
                 if monster_found.weapon:
