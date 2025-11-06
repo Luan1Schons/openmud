@@ -3499,20 +3499,20 @@ class CommandHandler:
         return player.room_id == "lobby"
     
     async def cmd_afk(self, player: Player, message: str = ""):
-        """Comando afk - marca como AFK (exclusivo do lobby)"""
-        if not self._is_lobby(player):
-            await self.send_message(player, 
-                f"{ANSI.YELLOW}Este comando só está disponível no Hall de Entrada (lobby).{ANSI.RESET}\r\n"
-                f"{ANSI.BRIGHT_CYAN}Use 'lobby' para voltar ao Hall de Entrada.{ANSI.RESET}")
-            return
-        
+        """Comando afk - marca como AFK (disponível em qualquer lugar)"""
         afk_message = message.strip() if message else "Ausente"
         player.afk_message = afk_message
         player.is_afk = True
         
+        # Inicializa timestamp do Pomodoro quando marca como AFK
+        import time
+        if not hasattr(player, '_last_pomodoro_time'):
+            player._last_pomodoro_time = time.time()
+        
         await self.send_message(player, 
             f"{ANSI.BRIGHT_YELLOW}Você está marcado como AFK: {afk_message}{ANSI.RESET}\r\n"
-            f"{ANSI.BRIGHT_CYAN}Use 'voltar' ou 'back' para voltar.{ANSI.RESET}")
+            f"{ANSI.BRIGHT_CYAN}Use 'voltar' ou 'back' para voltar.{ANSI.RESET}\r\n"
+            f"{ANSI.BRIGHT_GREEN}🍅 Você ganhará experiência a cada 5 minutos enquanto estiver AFK!{ANSI.RESET}\r\n")
         
         await self.game.broadcast_to_room(
             player.world_id,
@@ -3522,12 +3522,7 @@ class CommandHandler:
         )
     
     async def cmd_voltar(self, player: Player):
-        """Comando voltar/back - volta do AFK (exclusivo do lobby)"""
-        if not self._is_lobby(player):
-            await self.send_message(player, 
-                f"{ANSI.YELLOW}Este comando só está disponível no Hall de Entrada (lobby).{ANSI.RESET}")
-            return
-        
+        """Comando voltar/back - volta do AFK (disponível em qualquer lugar)"""
         if hasattr(player, 'is_afk') and player.is_afk:
             player.is_afk = False
             player.afk_message = ""

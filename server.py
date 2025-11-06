@@ -443,16 +443,34 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             writer.write(prompt.encode())
             await writer.drain()
             
-            data = await asyncio.wait_for(reader.readline(), timeout=300.0)
-            if not data:
-                break
+            # Se o jogador está AFK, não desconecta por timeout (timeout muito longo)
+            timeout = 86400.0 if (hasattr(player, 'is_afk') and player.is_afk) else 300.0
             
-            command = data.decode().strip()
-            if command:
-                await handler.handle_command(player, command)
+            try:
+                data = await asyncio.wait_for(reader.readline(), timeout=timeout)
+                if not data:
+                    break
+                
+                command = data.decode().strip()
+                if command:
+                    # Se estava AFK e digitou algo, remove o status AFK
+                    if hasattr(player, 'is_afk') and player.is_afk:
+                        player.is_afk = False
+                        player.afk_message = ""
+                    
+                    await handler.handle_command(player, command)
+            except asyncio.TimeoutError:
+                # Só desconecta se não estiver AFK
+                if not (hasattr(player, 'is_afk') and player.is_afk):
+                    writer.write(f"\n{ANSI.YELLOW}Tempo de inatividade excedido. Desconectando...{ANSI.RESET}\n".encode())
+                    break
+                # Se estiver AFK, continua o loop (não desconecta)
+                continue
     
     except asyncio.TimeoutError:
-        writer.write(f"\n{ANSI.YELLOW}Tempo de inatividade excedido. Desconectando...{ANSI.RESET}\n".encode())
+        # Só desconecta se não estiver AFK
+        if 'player' in locals() and not (hasattr(player, 'is_afk') and player.is_afk):
+            writer.write(f"\n{ANSI.YELLOW}Tempo de inatividade excedido. Desconectando...{ANSI.RESET}\n".encode())
     except Exception as e:
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Erro com {addr}: {e}")
     finally:
@@ -561,6 +579,102 @@ async def main():
     # Inicia task de regeneração de stamina
     asyncio.create_task(stamina_regeneration_task())
     
+    async def pomodoro_task():
+        """Task que dá experiência e chance de drop raro para jogadores AFK a cada 5 minutos"""
+        import time
+        import random
+        while True:
+            await asyncio.sleep(300.0)  # Espera 5 minutos (300 segundos)
+            current_time = time.time()
+            
+            for player_name, player in list(game.players.items()):
+                # Só processa jogadores AFK
+                if not (hasattr(player, 'is_afk') and player.is_afk):
+                    continue
+                
+                # Inicializa timestamp se não existir
+                if not hasattr(player, '_last_pomodoro_time'):
+                    player._last_pomodoro_time = current_time
+                
+                # Calcula tempo passado
+                time_passed = current_time - player._last_pomodoro_time
+                
+                # Processa Pomodoro a cada 5 minutos
+                if time_passed >= 300.0:
+                    pomodoro_count = int(time_passed / 300.0)
+                    if pomodoro_count > 0:
+                        # Atualiza timestamp
+                        player._last_pomodoro_time = current_time - (time_passed % 300.0)
+                        
+                        # Dá experiência baseada no nível (10-20 exp por Pomodoro)
+                        exp_per_pomodoro = 10 + (player.level // 3)  # Aumenta com o nível
+                        exp_gained = exp_per_pomodoro * pomodoro_count
+                        player.experience += exp_gained
+                        
+                        # Cria handler temporário para enviar mensagens e verificar level up
+                        from mud.commands.commands import CommandHandler
+                        from mud.utils.ansi import ANSI
+                        handler = CommandHandler(game, world_manager, database, game_data, lore_manager, quest_manager, world_lore_manager, dungeon_manager)
+                        
+                        # Envia mensagem de experiência ganha
+                        try:
+                            await handler.send_message(player, 
+                                f"{ANSI.BRIGHT_GREEN}🍅 Pomodoro completo! Você ganhou {exp_gained} de experiência por estar AFK!{ANSI.RESET}\r\n")
+                            
+                            # Verifica level up
+                            await handler._check_level_up(player)
+                            
+                            # Chance de 5% de dropar item raro por Pomodoro
+                            for _ in range(pomodoro_count):
+                                if random.random() < 0.05:  # 5% de chance
+                                    # Obtém lista de itens raros
+                                    rare_items = []
+                                    for item_id, item in game_data.items.items():
+                                        if item.rarity in ['rare', 'epic', 'legendary']:
+                                            rare_items.append(item_id)
+                                    
+                                    if rare_items:
+                                        # Escolhe um item raro aleatório
+                                        rare_item_id = random.choice(rare_items)
+                                        rare_item = game_data.get_item(rare_item_id)
+                                        
+                                        if rare_item:
+                                            player.add_item(rare_item_id)
+                                            rarity_color = rare_item.get_rarity_color()
+                                            await handler.send_message(player,
+                                                f"{ANSI.BRIGHT_YELLOW}✨ Sorte! Você encontrou um item raro enquanto estava AFK: {rarity_color}{rare_item.name}{ANSI.RESET} ✨\r\n")
+                            
+                            # Salva no banco
+                            stats = {
+                                'hp': player.current_hp,
+                                'max_hp': player.max_hp,
+                                'current_stamina': player.current_stamina,
+                                'max_stamina': player.max_stamina,
+                                'level': player.level,
+                                'experience': player.experience,
+                                'attack': player.attack,
+                                'defense': player.defense,
+                                'gold': player.gold,
+                                'inventory': player.inventory,
+                                'equipment': player.equipment,
+                                'active_quests': player.active_quests,
+                                'quest_progress': player.quest_progress,
+                                'completed_quests': player.completed_quests,
+                                'known_spells': player.known_spells,
+                                'equipped_spells': player.equipped_spells,
+                                'active_perks': player.active_perks,
+                                'spell_cooldowns': player.spell_cooldowns,
+                                'unspent_points': player.unspent_points
+                            }
+                            database.update_player_stats(player.name, stats)
+                        except Exception as e:
+                            # Se houver erro ao enviar mensagem (jogador desconectado), ignora
+                            print(f"[Pomodoro] Erro ao processar Pomodoro para {player_name}: {e}")
+                            pass
+    
+    # Inicia task de Pomodoro
+    asyncio.create_task(pomodoro_task())
+    
     print(f"\n{'=' * 50}")
     print(f"Servidor OpenMud MUD iniciado!")
     print(f"{'=' * 50}")
@@ -569,6 +683,7 @@ async def main():
     print(f"Modo: {'Produção' if os.environ.get('PORT') else 'Desenvolvimento'}")
     print(f"\nAguardando conexões...")
     print(f"Sistema de regeneração de stamina ativo (1 ponto a cada 3 segundos)")
+    print(f"Sistema de Pomodoro ativo (experiência a cada 5 minutos para jogadores AFK)")
     print(f"\nPara conectar:")
     print(f"  Local: telnet localhost {PORT}")
     print(f"  Externo: telnet <seu-ip> {PORT}")
