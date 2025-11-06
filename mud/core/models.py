@@ -279,6 +279,9 @@ class Player:
     is_afk: bool = False
     afk_message: str = ""
     
+    # Canais de chat (channels)
+    channels: List[str] = None  # Lista de canais que o jogador está inscrito
+    
     def __post_init__(self):
         if self.inventory is None:
             self.inventory = []
@@ -304,6 +307,9 @@ class Player:
             self.is_afk = False
         if not hasattr(self, 'afk_message'):
             self.afk_message = ""
+        if self.channels is None:
+            # Canal "local" sempre está ativo por padrão
+            self.channels = ["local"]
     
     def is_alive(self) -> bool:
         return self.current_hp > 0

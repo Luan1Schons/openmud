@@ -4,7 +4,7 @@ Sistema de comandos do MUD
 
 from typing import Optional, Dict, List
 from mud.core.models import Player, Monster
-from mud.utils.ansi import ANSI
+from mud.utils.ansi import ANSI, Colors
 from mud.managers.world_manager import WorldManager
 from mud.core.database import Database
 from mud.managers.game_data import GameDataManager
@@ -41,6 +41,8 @@ class CommandHandler:
         }
         # Monstros em combate por jogador
         self.in_combat: dict[str, str] = {}  # player_name -> monster_id
+        # Estado do combate estilo Pokémon (armazena informações do combate atual)
+        self.combat_state: dict[str, dict] = {}  # player_name -> {monster_instance_id, turn_waiting, etc}
         
         # Sistema de identificadores de monstros (estilo MUD tradicional)
         # {world_id: {room_id: {monster_instance_id: Monster}}}
@@ -78,12 +80,22 @@ class CommandHandler:
             'i': (self.cmd_inventory, True, False),
             'sair': (self.cmd_exit_dungeon, False, False),
             'exit_dungeon': (self.cmd_exit_dungeon, False, False),
+            'channels': (self.cmd_channels, False, False),
+            'chan': (self.cmd_channels, False, False),
+            'inspect': (self.cmd_inspect, True, False),
+            'examine': (self.cmd_inspect, True, False),
+            'lookat': (self.cmd_inspect, True, False),
+            'view': (self.cmd_inspect, True, False),
+            'mapa': (self.cmd_mapa, False, False),
+            'map': (self.cmd_mapa, False, False),
             
             # Comandos com argumentos
             'say': (self.cmd_say, True, False),
             '"': (self.cmd_say, True, False),
             'shout': (self.cmd_shout, True, False),
             'global': (self.cmd_shout, True, False),
+            'join': (self.cmd_join, True, False),
+            'leave': (self.cmd_leave, True, False),
             'attack': (self.cmd_attack, True, True),  # precisa atualizar quests
             'kill': (self.cmd_attack, True, True),
             'k': (self.cmd_attack, True, True),  # alias curto para kill
@@ -140,6 +152,21 @@ class CommandHandler:
         
         cmd = parts[0]
         args_str = ' '.join(parts[1:]) if len(parts) > 1 else ''
+        
+        # Se está em combate, só permite comandos de combate (menu estilo Pokémon)
+        if player.name in self.in_combat:
+            # Comandos permitidos durante combate: números (1-9) para menu, ou comandos específicos
+            if cmd.isdigit():
+                # É uma escolha do menu de combate
+                await self._handle_combat_menu_choice(player, int(cmd))
+                return
+            elif cmd in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                await self._handle_combat_menu_choice(player, int(cmd))
+                return
+            else:
+                # Mostra menu de combate e ignora outros comandos
+                await self._show_combat_menu(player)
+                return
         
         # Verifica se é um comando de direção (movimento) - tratado separadamente
         if cmd in self.directions:
@@ -208,23 +235,23 @@ class CommandHandler:
         if self.dungeon_manager and self.dungeon_manager.is_dungeon_room(player.world_id, player.room_id):
             await self._spawn_dungeon_entities(player, player.room_id)
         
-        message = f"\r\n{ANSI.BOLD}{ANSI.CYAN}{room.name}{ANSI.RESET}\r\n"
-        message += f"{ANSI.BRIGHT_BLACK}{'=' * len(room.name)}{ANSI.RESET}\r\n"
+        message = f"\r\n{Colors.TITLE}{room.name}{Colors.RESET}\r\n"
+        message += f"{Colors.SEPARATOR}{'=' * len(room.name)}{Colors.RESET}\r\n\r\n"
         
         # Descrição da sala + lore
-        message += f"{room.description}\r\n"
+        message += f"{Colors.DESCRIPTION}{room.description}{Colors.RESET}\r\n"
         room_lore = self.lore_manager.get_room_lore(player.world_id, player.room_id)
         if room_lore and 'story' in room_lore:
-            message += f"\r\n{ANSI.BRIGHT_MAGENTA}{room_lore['story']}{ANSI.RESET}\r\n"
+            message += f"\r\n{Colors.INFO}{room_lore['story']}{Colors.RESET}\r\n"
         
         # Informações especiais do lobby
         if player.room_id == "lobby":
-            message += f"\r\n{ANSI.BOLD}{ANSI.BRIGHT_CYAN}=== Comandos Exclusivos do Lobby ==={ANSI.RESET}\r\n"
-            message += f"{ANSI.BRIGHT_GREEN}afk [mensagem]{ANSI.RESET} - Marca como AFK\r\n"
-            message += f"{ANSI.BRIGHT_GREEN}voltar / back{ANSI.RESET} - Volta do AFK\r\n"
-            message += f"{ANSI.BRIGHT_GREEN}lobby{ANSI.RESET} - Volta ao Hall de Entrada (de qualquer lugar)\r\n"
-            message += f"{ANSI.BRIGHT_GREEN}respawn{ANSI.RESET} - Regenera completamente HP e Stamina\r\n"
-            message += f"{ANSI.BRIGHT_GREEN}server / status_server{ANSI.RESET} - Mostra status do servidor\r\n"
+            message += f"\r\n{Colors.SECTION}=== Comandos Exclusivos do Lobby ==={Colors.RESET}\r\n"
+            message += f"{Colors.COMMAND}afk [mensagem]{Colors.RESET} - Marca como AFK\r\n"
+            message += f"{Colors.COMMAND}voltar / back{Colors.RESET} - Volta do AFK\r\n"
+            message += f"{Colors.COMMAND}lobby{Colors.RESET} - Volta ao Hall de Entrada (de qualquer lugar)\r\n"
+            message += f"{Colors.COMMAND}respawn{Colors.RESET} - Regenera completamente HP e Stamina\r\n"
+            message += f"{Colors.COMMAND}server / status_server{Colors.RESET} - Mostra status do servidor\r\n"
         
         message += "\r\n"
         
@@ -252,72 +279,86 @@ class CommandHandler:
         monster_instances = self.monster_instances[player.world_id].get(player.room_id, {})
         
         if monster_instances:
-            message += f"{ANSI.BRIGHT_RED}Monstros aqui:{ANSI.RESET}\r\n"
+            message += f"{Colors.MONSTER}Monstros aqui:{Colors.RESET}\r\n"
             # Ordena por ID para mostrar em ordem
-            from mud.utils.visuals import get_monster_ascii, format_hp_bar
+            from mud.utils.visuals import get_monster_ascii, format_hp_bar, format_ascii_with_text
             for monster_instance_id in sorted(monster_instances.keys()):
                 monster = monster_instances[monster_instance_id]
                 if monster and monster.is_alive():
                     # ASCII art do monstro
                     monster_ascii = get_monster_ascii(monster.id)
                     
-                    # Mostra informações do monstro
-                    level_info = f" {ANSI.BRIGHT_YELLOW}[Nível {monster.level}]{ANSI.RESET}"
+                    # Monta informações do monstro
+                    level_info = f"{Colors.NUMBER}[Nível {monster.level}]{Colors.RESET}"
                     weapon_info = ""
                     if monster.weapon:
-                        weapon_info = f" {ANSI.BRIGHT_BLACK}({monster.weapon}){ANSI.RESET}"
+                        weapon_info = f" {Colors.HINT}({monster.weapon}){Colors.RESET}"
                     
                     race_info = ""
                     if monster.race_id:
                         from mud.systems.monster_races import get_race_icon, get_race_name
-                        race_info = f" {get_race_icon(monster.race_id)} {ANSI.BRIGHT_MAGENTA}[{get_race_name(monster.race_id)}]{ANSI.RESET}"
+                        race_info = f" {get_race_icon(monster.race_id)} {Colors.TYPE}[{get_race_name(monster.race_id)}]{Colors.RESET}"
                     
-                    message += f"  {ANSI.BRIGHT_CYAN}[{monster_instance_id}]{ANSI.RESET} {ANSI.BRIGHT_RED}{monster.name}{ANSI.RESET}{race_info}{level_info}{weapon_info}\r\n"
-                    message += f"{monster_ascii}\r\n"
-                    message += f"  {format_hp_bar(monster.current_hp, monster.max_hp, f'{monster.name} HP')}\r\n"
+                    # Monta texto com informações do monstro
+                    from mud.utils.visuals import format_monster_hp_bar
+                    monster_info = f"{Colors.LABEL}[{monster_instance_id}]{Colors.RESET} {Colors.MONSTER}{monster.name}{Colors.RESET}{race_info}{level_info}{weapon_info}"
+                    monster_info += f"\r\n{format_monster_hp_bar(monster.current_hp, monster.max_hp, 'HP')}"
+                    
+                    # Formata monstro com ASCII à esquerda e informações à direita
+                    formatted_monster = format_ascii_with_text(monster_ascii, monster_info, ascii_width=22)
+                    message += f"{formatted_monster}\r\n\r\n"
         
         # NPCs
         if entities['npcs']:
-            message += f"{ANSI.BRIGHT_CYAN}NPCs aqui:{ANSI.RESET}\r\n"
-            from mud.utils.visuals import get_npc_ascii
+            message += f"{Colors.NPC}NPCs aqui:{Colors.RESET}\r\n"
+            from mud.utils.visuals import get_npc_ascii, format_ascii_with_text
             for npc_id in entities['npcs']:
                 npc = self.game_data.get_npc(player.world_id, npc_id)
                 if npc:
                     npc_ascii = get_npc_ascii(npc.npc_type)
-                    message += f"  {ANSI.BRIGHT_CYAN}{npc.name}{ANSI.RESET}\r\n"
-                    message += f"{npc_ascii}\r\n"
+                    # Formata NPC com ASCII à esquerda e informações à direita
+                    npc_info = f"{Colors.NPC}{npc.name}{Colors.RESET}"
+                    if npc.description:
+                        npc_info += f" {Colors.DESCRIPTION}{npc.description}{Colors.RESET}"
+                    formatted_npc = format_ascii_with_text(npc_ascii, npc_info, ascii_width=22)
+                    message += f"{formatted_npc}\r\n\r\n"
         
         # Itens no chão
         if entities['items']:
-            message += f"{ANSI.BRIGHT_YELLOW}Itens aqui:{ANSI.RESET} "
+            message += f"\r\n{Colors.ITEM}Itens aqui:{Colors.RESET} "
             item_names = []
             for item_id in entities['items']:
                 item = self.game_data.get_item(item_id)
                 if item:
-                    item_names.append(item.name)
+                    item_names.append(f"{Colors.ITEM}{item.name}{Colors.RESET}")
             message += f"{', '.join(item_names)}\r\n"
         
         # Mostra saídas disponíveis
         if room.exits:
             exits = list(room.exits.keys())
-            message += f"\r\n{ANSI.BRIGHT_GREEN}Saídas:{ANSI.RESET} {', '.join(exits)}\r\n"
+            message += f"\r\n{Colors.INFO}Saídas:{Colors.RESET} {Colors.COMMAND}{', '.join(exits)}{Colors.RESET}\r\n"
         
         # Mostra portas de dungeon se houver
         if self.dungeon_manager:
             dungeon = self.dungeon_manager.get_dungeon_by_entry_room(player.world_id, player.room_id)
             if dungeon:
-                message += f"\r\n{ANSI.BRIGHT_MAGENTA}Porta:{ANSI.RESET} {dungeon['name']}\r\n"
-                message += f"{ANSI.BRIGHT_YELLOW}Use: {dungeon.get('entry_command', 'entrar')}{ANSI.RESET}\r\n"
+                message += f"\r\n{Colors.CATEGORY}Porta:{Colors.RESET} {Colors.ITEM}{dungeon['name']}{Colors.RESET}\r\n"
+                message += f"{Colors.HINT}Use: {Colors.COMMAND}{dungeon.get('entry_command', 'entrar')}{Colors.RESET}\r\n"
         
         # Mostra outros jogadores na sala
         other_players = [p.name for p in self.game.get_players_in_room(player.world_id, player.room_id) if p.name != player.name]
         if other_players:
-            message += f"\r\n{ANSI.YELLOW}Também aqui:{ANSI.RESET} {', '.join(other_players)}\r\n"
+            message += f"\r\n{Colors.WARNING}Também aqui:{Colors.RESET} {Colors.PLAYER}{', '.join(other_players)}{Colors.RESET}\r\n"
         
         await self.send_message(player, message)
     
     async def cmd_move(self, player: Player, direction: str):
         """Comando move - move o jogador para outra sala"""
+        # Verifica se o jogador está em combate
+        if player.name in self.in_combat:
+            await self.send_message(player, f"{ANSI.RED}Você está em combate! Não pode sair da sala até o combate acabar.{ANSI.RESET}")
+            return
+        
         # Tenta buscar na sala normal primeiro, depois em dungeon
         room = self.world_manager.get_room(player.world_id, player.room_id, self.dungeon_manager)
         if not room:
@@ -470,6 +511,11 @@ class CommandHandler:
     
     async def cmd_enter(self, player: Player, target: str):
         """Comando enter - entra em uma dungeon/porta ou usa saída normal 'entrar'"""
+        # Verifica se o jogador está em combate
+        if player.name in self.in_combat:
+            await self.send_message(player, f"{ANSI.RED}Você está em combate! Não pode sair da sala até o combate acabar.{ANSI.RESET}")
+            return
+        
         # Primeiro verifica se 'entrar' é uma saída normal da sala
         room = self.world_manager.get_room(player.world_id, player.room_id, self.dungeon_manager)
         if room and 'entrar' in room.exits:
@@ -538,6 +584,11 @@ class CommandHandler:
     
     async def cmd_exit_dungeon(self, player: Player):
         """Comando sair - sai de uma dungeon"""
+        # Verifica se o jogador está em combate
+        if player.name in self.in_combat:
+            await self.send_message(player, f"{ANSI.RED}Você está em combate! Não pode sair da sala até o combate acabar.{ANSI.RESET}")
+            return
+        
         if not self.dungeon_manager:
             await self.send_message(player, f"{ANSI.YELLOW}Sistema de dungeons não disponível.{ANSI.RESET}")
             return
@@ -851,6 +902,478 @@ class CommandHandler:
                 if 'slime' not in entities['monsters']:
                     entities['monsters'].append('slime')
     
+    async def _show_combat_menu(self, player: Player):
+        """Mostra o menu de combate estilo Pokémon"""
+        if player.name not in self.in_combat:
+            return
+        
+        # Obtém informações do combate atual
+        combat_key = self.in_combat[player.name]
+        world_id, room_id, monster_instance_id = combat_key.split(':')
+        monster_instance_id = int(monster_instance_id)
+        
+        monster_instances = self.monster_instances.get(world_id, {}).get(room_id, {})
+        monster = monster_instances.get(monster_instance_id)
+        
+        if not monster or not monster.is_alive():
+            # Monstro morreu, limpa combate
+            if player.name in self.in_combat:
+                del self.in_combat[player.name]
+            if player.name in self.combat_state:
+                del self.combat_state[player.name]
+            return
+        
+        # Monta menu
+        message = f"\r\n{ANSI.BOLD}{ANSI.BRIGHT_RED}=== COMBATE ==={ANSI.RESET}\r\n\r\n"
+        
+        # Informações do monstro
+        from mud.utils.visuals import format_monster_hp_bar
+        level_info = f" [Nível {monster.level}]" if monster.level > 1 else ""
+        message += f"{ANSI.BRIGHT_RED}Monstro:{ANSI.RESET} {monster.name}{level_info}\r\n"
+        message += f"{format_monster_hp_bar(monster.current_hp, monster.max_hp, 'HP')}\r\n\r\n"
+        
+        # Informações do jogador
+        from mud.utils.visuals import format_hp_bar, format_stamina_bar
+        message += f"{ANSI.BRIGHT_GREEN}Você:{ANSI.RESET} {player.name}\r\n"
+        message += f"{format_hp_bar(player.current_hp, player.max_hp)}\r\n"
+        message += f"{format_stamina_bar(player.current_stamina, player.max_stamina)}\r\n\r\n"
+        
+        # Opções do menu
+        message += f"{ANSI.BOLD}{ANSI.BRIGHT_CYAN}Escolha sua ação:{ANSI.RESET}\r\n"
+        message += f"  {ANSI.BRIGHT_YELLOW}1{ANSI.RESET} - {ANSI.BRIGHT_GREEN}Ataque{ANSI.RESET}\r\n"
+        
+        # Magias equipadas
+        menu_option = 2
+        available_spells = []
+        if player.equipped_spells:
+            for spell_id in player.equipped_spells:
+                spell = self.spell_system.get_spell(spell_id)
+                if spell:
+                    import time
+                    # Verifica cooldown
+                    cooldown_ok = True
+                    if spell_id in player.spell_cooldowns:
+                        cooldown_end = player.spell_cooldowns[spell_id]
+                        if time.time() < cooldown_end:
+                            cooldown_ok = False
+                    
+                    # Verifica stamina
+                    spell_level = player.get_spell_level(spell_id)
+                    cost = self.spell_system.calculate_spell_cost(spell, spell_level)
+                    stamina_ok = player.has_stamina(cost)
+                    
+                    if cooldown_ok and stamina_ok:
+                        available_spells.append((menu_option, spell_id, spell, cost))
+                        message += f"  {ANSI.BRIGHT_YELLOW}{menu_option}{ANSI.RESET} - {ANSI.BRIGHT_MAGENTA}{spell.name}{ANSI.RESET} (Stamina: {cost})\r\n"
+                        menu_option += 1
+        
+        # Itens consumíveis no inventário
+        available_items = []
+        for item_id in player.inventory:
+            item = self.game_data.get_item(item_id)
+            if item and item.type == 'consumable':
+                available_items.append((menu_option, item_id, item))
+                # Mostra efeito do item
+                effects = []
+                if 'hp' in item.stats:
+                    effects.append(f"+{item.stats['hp']} HP")
+                if 'stamina' in item.stats:
+                    effects.append(f"+{item.stats['stamina']} Stamina")
+                effects_str = ", ".join(effects) if effects else "Efeito"
+                message += f"  {ANSI.BRIGHT_YELLOW}{menu_option}{ANSI.RESET} - {ANSI.BRIGHT_CYAN}{item.name}{ANSI.RESET} ({effects_str})\r\n"
+                menu_option += 1
+                if menu_option > 9:  # Limita a 9 opções
+                    break
+        
+        message += f"\r\n{ANSI.BRIGHT_BLACK}Digite o número da ação (1-{menu_option-1}):{ANSI.RESET}\r\n"
+        
+        # Armazena estado do combate para processar escolhas
+        self.combat_state[player.name] = {
+            'monster_instance_id': monster_instance_id,
+            'world_id': world_id,
+            'room_id': room_id,
+            'available_spells': available_spells,
+            'available_items': available_items,
+            'max_option': menu_option - 1
+        }
+        
+        await self.send_message(player, message)
+    
+    async def _handle_combat_menu_choice(self, player: Player, choice: int):
+        """Processa escolha do menu de combate"""
+        if player.name not in self.in_combat or player.name not in self.combat_state:
+            await self._show_combat_menu(player)
+            return
+        
+        combat_info = self.combat_state[player.name]
+        monster_instance_id = combat_info['monster_instance_id']
+        world_id = combat_info['world_id']
+        room_id = combat_info['room_id']
+        
+        if choice < 1 or choice > combat_info['max_option']:
+            await self.send_message(player, f"{ANSI.RED}Opção inválida! Escolha entre 1 e {combat_info['max_option']}.{ANSI.RESET}")
+            await self._show_combat_menu(player)
+            return
+        
+        monster_instances = self.monster_instances.get(world_id, {}).get(room_id, {})
+        monster = monster_instances.get(monster_instance_id)
+        
+        if not monster or not monster.is_alive():
+            # Monstro morreu
+            if player.name in self.in_combat:
+                del self.in_combat[player.name]
+            if player.name in self.combat_state:
+                del self.combat_state[player.name]
+            return
+        
+        # Opção 1 = Ataque básico
+        if choice == 1:
+            await self._execute_combat_attack(player, monster, monster_instance_id, world_id, room_id)
+        else:
+            # Verifica se é uma magia
+            found_spell = None
+            for opt_num, spell_id, spell, cost in combat_info['available_spells']:
+                if opt_num == choice:
+                    found_spell = (spell_id, spell, cost)
+                    break
+            
+            if found_spell:
+                spell_id, spell, cost = found_spell
+                await self._execute_combat_spell(player, monster, monster_instance_id, world_id, room_id, spell_id, spell, cost)
+            else:
+                # Verifica se é um item
+                found_item = None
+                for opt_num, item_id, item in combat_info['available_items']:
+                    if opt_num == choice:
+                        found_item = (item_id, item)
+                        break
+                
+                if found_item:
+                    item_id, item = found_item
+                    await self._execute_combat_item(player, monster, monster_instance_id, world_id, room_id, item_id, item)
+                else:
+                    await self.send_message(player, f"{ANSI.RED}Opção inválida!{ANSI.RESET}")
+                    await self._show_combat_menu(player)
+    
+    async def _execute_combat_attack(self, player: Player, monster: Monster, monster_instance_id: int, world_id: str, room_id: str):
+        """Executa ataque básico no combate"""
+        # Ataque do jogador
+        result = await CombatSystem.attack_monster(
+            player, monster,
+            lambda msg: self.send_message(player, msg),
+            self.game_data
+        )
+        
+        # Verifica se o jogador morreu
+        if result == "player_died" or not player.is_alive():
+            await self._handle_player_death(player)
+            return
+        
+        # Se o monstro morreu, processa morte e verifica próximo monstro
+        if result:
+            await self._handle_monster_death(player, monster, monster_instance_id, world_id, room_id)
+        else:
+            # Monstro ainda vivo, mostra menu novamente
+            await self._show_combat_menu(player)
+    
+    async def _execute_combat_spell(self, player: Player, monster: Monster, monster_instance_id: int, world_id: str, room_id: str, spell_id: str, spell, cost: int):
+        """Executa magia no combate"""
+        import time
+        
+        # Verifica stamina novamente
+        if not player.has_stamina(cost):
+            await self.send_message(player, f"{ANSI.RED}Stamina insuficiente!{ANSI.RESET}")
+            await self._show_combat_menu(player)
+            return
+        
+        # Gasta stamina
+        player.use_stamina(cost)
+        
+        # Aplica cooldown
+        player.spell_cooldowns[spell_id] = time.time() + spell.cooldown
+        
+        # Animação de magia
+        from mud.utils.visuals import get_spell_animation, get_heal_animation
+        import asyncio
+        
+        if spell.damage_type == 'heal':
+            animation = get_heal_animation()
+            for frame in animation:
+                await self.send_message(player, f"\r{ANSI.BRIGHT_MAGENTA}{frame}{ANSI.RESET}")
+                await asyncio.sleep(0.1)
+            
+            # Cura
+            spell_level = player.get_spell_level(spell_id)
+            from mud.systems.classes import ClassSystem
+            class_system = ClassSystem()
+            race = class_system.get_race(player.race_id) if player.race_id else None
+            race_bonus = 1.0
+            
+            heal_amount = self.spell_system.calculate_spell_damage(
+                spell, player.level, player.attack, spell_level, race_bonus
+            )
+            player.heal(heal_amount)
+            from mud.utils.visuals import format_hp_bar
+            await self.send_message(player, f"\r{ANSI.BRIGHT_GREEN}✨ Você lança {spell.name} e se cura {heal_amount} de HP! ✨{ANSI.RESET}\r\n")
+            await self.send_message(player, f"{format_hp_bar(player.current_hp, player.max_hp)}\r\n")
+            
+            # Após usar item/magia, monstros atacam
+            await self._monsters_turn(player, monster, monster_instance_id, world_id, room_id)
+        else:
+            # Magia de dano
+            animation = get_spell_animation()
+            for frame in animation:
+                await self.send_message(player, f"\r{ANSI.BRIGHT_MAGENTA}{frame}{ANSI.RESET}")
+                await asyncio.sleep(0.1)
+            
+            # Chance de falha
+            import random
+            spell_level = player.get_spell_level(spell_id)
+            fail_chance = max(0.05, 0.15 - (spell_level * 0.02))
+            if random.random() < fail_chance:
+                await self.send_message(player, f"\r{ANSI.RED}❌ Sua magia {spell.name} falhou! ❌{ANSI.RESET}\r\n")
+                await self._monsters_turn(player, monster, monster_instance_id, world_id, room_id)
+                return
+            
+            # Calcula dano
+            spell_level = player.get_spell_level(spell_id)
+            from mud.systems.classes import ClassSystem
+            class_system = ClassSystem()
+            race = class_system.get_race(player.race_id) if player.race_id else None
+            race_bonus = 1.0
+            
+            damage = self.spell_system.calculate_spell_damage(
+                spell, player.level, player.attack, spell_level, race_bonus
+            )
+            
+            # Aplica dano
+            actual_damage = monster.take_damage(damage, spell.damage_type)
+            
+            damage_icon = "🔥" if spell.damage_type == "fire" else "❄" if spell.damage_type == "ice" else "⚡" if spell.damage_type == "lightning" else "✨"
+            await self.send_message(player, f"\r{ANSI.BRIGHT_GREEN}{damage_icon} Você lança {spell.name} em {monster.name} causando {actual_damage} de dano! {damage_icon}{ANSI.RESET}\r\n")
+            
+            from mud.utils.visuals import format_monster_hp_bar, get_hp_color
+            hp_color = get_hp_color(monster.current_hp, monster.max_hp)
+            monster_hp_display = f"{hp_color}{monster.name} HP:{ANSI.RESET} {format_monster_hp_bar(monster.current_hp, monster.max_hp)}"
+            await self.send_message(player, f"{monster_hp_display}\r\n")
+            
+            # Verifica se o monstro morreu
+            if not monster.is_alive():
+                await self._handle_monster_death(player, monster, monster_instance_id, world_id, room_id)
+            else:
+                # Monstro ainda vivo, monstros atacam
+                await self._monsters_turn(player, monster, monster_instance_id, world_id, room_id)
+    
+    async def _execute_combat_item(self, player: Player, monster: Monster, monster_instance_id: int, world_id: str, room_id: str, item_id: str, item):
+        """Executa uso de item no combate"""
+        # Aplica efeitos do item
+        effects_applied = []
+        hp_healed = 0
+        stamina_restored = 0
+        
+        if 'hp' in item.stats:
+            old_hp = player.current_hp
+            player.heal(item.stats['hp'])
+            hp_healed = player.current_hp - old_hp
+            if hp_healed > 0:
+                effects_applied.append(f"{hp_healed} de HP")
+        
+        if 'stamina' in item.stats:
+            old_stamina = player.current_stamina
+            player.restore_stamina(item.stats['stamina'])
+            stamina_restored = player.current_stamina - old_stamina
+            if stamina_restored > 0:
+                effects_applied.append(f"{stamina_restored} de stamina")
+        
+        if not effects_applied:
+            await self.send_message(player, f"{ANSI.YELLOW}{item.name} não teve efeito.{ANSI.RESET}")
+            await self._show_combat_menu(player)
+            return
+        
+        # Remove item do inventário
+        player.remove_item(item_id)
+        
+        # Mensagem de sucesso
+        effects_text = ", ".join(effects_applied)
+        await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você usou {item.name} e recuperou {effects_text}!{ANSI.RESET}\r\n")
+        
+        # Mostra barras atualizadas
+        from mud.utils.visuals import format_hp_bar, format_stamina_bar
+        if hp_healed > 0:
+            await self.send_message(player, f"{format_hp_bar(player.current_hp, player.max_hp)}\r\n")
+        if stamina_restored > 0:
+            await self.send_message(player, f"{format_stamina_bar(player.current_stamina, player.max_stamina)}\r\n")
+        
+        # Salva no banco
+        stats = {
+            'hp': player.current_hp,
+            'max_hp': player.max_hp,
+            'current_stamina': player.current_stamina,
+            'max_stamina': player.max_stamina,
+            'level': player.level,
+            'experience': player.experience,
+            'attack': player.attack,
+            'defense': player.defense,
+            'gold': player.gold,
+            'inventory': player.inventory,
+            'equipment': player.equipment,
+            'active_quests': player.active_quests,
+            'quest_progress': player.quest_progress,
+            'completed_quests': player.completed_quests,
+            'known_spells': player.known_spells,
+            'equipped_spells': player.equipped_spells,
+            'active_perks': player.active_perks,
+            'spell_cooldowns': player.spell_cooldowns
+        }
+        self.database.update_player_stats(player.name, stats)
+        
+        # Após usar item, monstros atacam
+        await self._monsters_turn(player, monster, monster_instance_id, world_id, room_id)
+    
+    async def _monsters_turn(self, player: Player, monster: Monster, monster_instance_id: int, world_id: str, room_id: str):
+        """Executa turno dos monstros (após jogador usar item ou magia)"""
+        import asyncio
+        await asyncio.sleep(0.3)
+        
+        if not monster.is_alive():
+            await self._handle_monster_death(player, monster, monster_instance_id, world_id, room_id)
+            return
+        
+        # Monstro ataca
+        monster_damage = monster.get_attack_damage()
+        total_defense = player.get_total_defense(self.game_data)
+        actual_damage = player.take_damage(monster_damage, total_defense)
+        
+        level_info = f" [Nível {monster.level}]" if monster.level > 1 else ""
+        weapon_info = ""
+        if monster.weapon:
+            weapon_info = f" com {monster.weapon}"
+        
+        await self.send_message(player, f"{ANSI.RED}👹 {monster.name}{level_info} ataca você{weapon_info} causando {actual_damage} de dano! 💥{ANSI.RESET}\r\n")
+        
+        from mud.utils.visuals import format_hp_bar, format_stamina_bar
+        player_hp_bar = format_hp_bar(player.current_hp, player.max_hp)
+        player_stamina_bar = format_stamina_bar(player.current_stamina, player.max_stamina)
+        await self.send_message(player, f"{player_hp_bar}\r\n")
+        await self.send_message(player, f"{player_stamina_bar}\r\n")
+        
+        if not player.is_alive():
+            await self._handle_player_death(player)
+            return
+        
+        # Mostra menu novamente
+        await self._show_combat_menu(player)
+    
+    async def _handle_monster_death(self, player: Player, monster: Monster, monster_instance_id: int, world_id: str, room_id: str):
+        """Processa morte do monstro e verifica se há mais monstros para combater"""
+        # Remove instância do monstro
+        if monster_instance_id in self.monster_instances.get(world_id, {}).get(room_id, {}):
+            del self.monster_instances[world_id][room_id][monster_instance_id]
+        
+        # Remove template da lista de entidades da sala
+        self.game_data.remove_monster_from_room(world_id, room_id, monster.id)
+        
+        # Limpa estado de combate
+        if player.name in self.in_combat:
+            del self.in_combat[player.name]
+        if player.name in self.combat_state:
+            del self.combat_state[player.name]
+        
+        # Registra morte do monstro para sistema de respawn (5 minutos mínimo)
+        import random
+        if self.dungeon_manager:
+            respawn_config = self.dungeon_manager.get_room_respawn_time(
+                world_id, room_id, monster.id
+            )
+            # Garante mínimo de 5 minutos (300 segundos)
+            if respawn_config['min'] < 300:
+                respawn_config['min'] = 300
+            if respawn_config['max'] < 300:
+                respawn_config['max'] = 300
+        else:
+            respawn_config = {'min': 300, 'max': 600}  # 5-10 minutos
+        
+        respawn_time = random.randint(respawn_config['min'], respawn_config['max'])
+        self.database.register_monster_death(
+            world_id, room_id, monster.id, monster_instance_id, respawn_time
+        )
+        
+        # Experiência
+        exp_gained = CombatSystem.calculate_experience(monster)
+        player.experience += exp_gained
+        await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você ganhou {exp_gained} de experiência!{ANSI.RESET}\r\n")
+        
+        # Verifica level up
+        await self._check_level_up(player)
+        
+        # Salva experiência e nível
+        stats = {
+            'hp': player.current_hp,
+            'max_hp': player.max_hp,
+            'current_stamina': player.current_stamina,
+            'max_stamina': player.max_stamina,
+            'level': player.level,
+            'experience': player.experience,
+            'attack': player.attack,
+            'defense': player.defense,
+            'gold': player.gold,
+            'inventory': player.inventory,
+            'equipment': player.equipment,
+            'active_quests': player.active_quests,
+            'quest_progress': player.quest_progress,
+            'completed_quests': player.completed_quests,
+            'known_spells': player.known_spells,
+            'equipped_spells': player.equipped_spells,
+            'active_perks': player.active_perks,
+            'spell_cooldowns': player.spell_cooldowns,
+            'unspent_points': player.unspent_points
+        }
+        self.database.update_player_stats(player.name, stats)
+        
+        # Ouro
+        gold_gained = CombatSystem.drop_gold(monster)
+        if gold_gained > 0:
+            player.add_gold(gold_gained)
+            await self.send_message(player, f"{ANSI.BRIGHT_YELLOW}Você recebeu {gold_gained} moedas!{ANSI.RESET}\r\n")
+        
+        # Loot
+        loot_item = CombatSystem.drop_loot(monster)
+        if loot_item:
+            entities = self.game_data.get_room_entities(world_id, room_id)
+            entities['items'].append(loot_item)
+            item = self.game_data.get_item(loot_item)
+            if item:
+                await self.send_message(player, f"{ANSI.BRIGHT_YELLOW}{monster.name} dropou: {item.name}!{ANSI.RESET}\r\n")
+                await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Use 'get {item.name}' para pegar.{ANSI.RESET}\r\n")
+        
+        # Verifica se há mais monstros na sala para combater automaticamente
+        await self._check_and_start_next_combat(player, world_id, room_id)
+    
+    async def _check_and_start_next_combat(self, player: Player, world_id: str, room_id: str):
+        """Verifica se há mais monstros na sala e inicia combate automático"""
+        import asyncio
+        entities = self.game_data.get_room_entities(world_id, room_id)
+        
+        # Garante que há instâncias de monstros
+        await self._ensure_monster_instances(world_id, room_id, entities['monsters'])
+        
+        monster_instances = self.monster_instances.get(world_id, {}).get(room_id, {})
+        
+        # Procura primeiro monstro vivo
+        for instance_id, monster in monster_instances.items():
+            if monster and monster.is_alive():
+                # Inicia combate automático com este monstro
+                await self.send_message(player, f"{ANSI.BRIGHT_YELLOW}✨ {monster.name} aparece! ✨{ANSI.RESET}\r\n")
+                await asyncio.sleep(0.5)
+                
+                # Inicia combate
+                self.in_combat[player.name] = f"{world_id}:{room_id}:{instance_id}"
+                await self._show_combat_menu(player)
+                return
+        
+        # Não há mais monstros
+        await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você derrotou todos os monstros da sala!{ANSI.RESET}\r\n")
+    
     async def cmd_attack(self, player: Player, target: str):
         """Comando attack - ataca um monstro por ID ou nome (estilo MUD)"""
         if not target:
@@ -894,109 +1417,29 @@ class CommandHandler:
             await self.send_message(player, f"{ANSI.RED}Monstro '{target}' não encontrado aqui.{ANSI.RESET}")
             return
         
-        # Inicia combate
+        # Verifica se já está em combate
+        if player.name in self.in_combat:
+            await self.send_message(player, f"{ANSI.YELLOW}Você já está em combate! Use o menu de combate.{ANSI.RESET}")
+            await self._show_combat_menu(player)
+            return
+        
+        # Inicia combate estilo Pokémon (mostra menu)
         self.in_combat[player.name] = f"{player.world_id}:{player.room_id}:{monster_instance_id}"
-        
-        # Batalha
-        result = await CombatSystem.attack_monster(
-            player, monster_found, 
-            lambda msg: self.send_message(player, msg),
-            self.game_data
-        )
-        
-        # Verifica se o jogador morreu
-        if result == "player_died" or not player.is_alive():
-            await self._handle_player_death(player)
-            return
-        
-        if result:  # monster_died
-            # Remove instância do monstro
-            if monster_instance_id in self.monster_instances[player.world_id][player.room_id]:
-                del self.monster_instances[player.world_id][player.room_id][monster_instance_id]
-            
-            # Remove template da lista de entidades da sala
-            self.game_data.remove_monster_from_room(player.world_id, player.room_id, monster_found.id)
-            del self.in_combat[player.name]
-            
-            # Registra morte do monstro para sistema de respawn
-            import random
-            if self.dungeon_manager:
-                respawn_config = self.dungeon_manager.get_room_respawn_time(
-                    player.world_id, player.room_id, monster_found.id
-                )
-            else:
-                # Default: 5-10 minutos se não houver dungeon_manager
-                respawn_config = {'min': 300, 'max': 600}
-            
-            # Gera tempo aleatório de respawn entre min e max (em segundos)
-            respawn_time = random.randint(respawn_config['min'], respawn_config['max'])
-            self.database.register_monster_death(
-                player.world_id, player.room_id, monster_found.id, monster_instance_id, respawn_time
-            )
-            
-            # Experiência
-            exp_gained = CombatSystem.calculate_experience(monster_found)
-            player.experience += exp_gained
-            await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você ganhou {exp_gained} de experiência!{ANSI.RESET}")
-            
-            # Verifica level up
-            await self._check_level_up(player)
-            
-            # Salva experiência e nível (mesmo se não subiu de nível)
-            stats = {
-                'hp': player.current_hp,
-                'max_hp': player.max_hp,
-                'current_stamina': player.current_stamina,
-                'max_stamina': player.max_stamina,
-                'level': player.level,
-                'experience': player.experience,
-                'attack': player.attack,
-                'defense': player.defense,
-                'gold': player.gold,
-                'inventory': player.inventory,
-                'equipment': player.equipment,
-                'active_quests': player.active_quests,
-                'quest_progress': player.quest_progress,
-                'completed_quests': player.completed_quests,
-                'known_spells': player.known_spells,
-                'equipped_spells': player.equipped_spells,
-                'active_perks': player.active_perks,
-                'spell_cooldowns': player.spell_cooldowns,
-                'unspent_points': player.unspent_points
-            }
-            self.database.update_player_stats(player.name, stats)
-            
-            # Ouro
-            gold_gained = CombatSystem.drop_gold(monster_found)
-            if gold_gained > 0:
-                player.add_gold(gold_gained)
-                await self.send_message(player, f"{ANSI.BRIGHT_YELLOW}Você recebeu {gold_gained} moedas!{ANSI.RESET}")
-            
-            # Loot - dropa no chão
-            loot_item = CombatSystem.drop_loot(monster_found)
-            if loot_item:
-                entities = self.game_data.get_room_entities(player.world_id, player.room_id)
-                entities['items'].append(loot_item)
-                item = self.game_data.get_item(loot_item)
-                if item:
-                    await self.send_message(player, f"{ANSI.BRIGHT_YELLOW}{monster_found.name} dropou: {item.name}!{ANSI.RESET}")
-                    await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Use 'get {item.name}' para pegar.{ANSI.RESET}")
-        elif not monster_found.is_alive():
-            # Monstro morreu durante o combate (caso raro)
-            if monster_instance_id in self.monster_instances[player.world_id][player.room_id]:
-                del self.monster_instances[player.world_id][player.room_id][monster_instance_id]
-            del self.in_combat[player.name]
-        
-        if not player.is_alive():
-            await self._handle_player_death(player)
-            return
+        await self.send_message(player, f"{ANSI.BRIGHT_YELLOW}✨ Você inicia combate com {monster_found.name}! ✨{ANSI.RESET}\r\n")
+        await self._show_combat_menu(player)
     
     async def cmd_stats(self, player: Player):
         """Comando stats - mostra estatísticas do jogador"""
         from mud.systems.classes import ClassSystem
+        from mud.utils.ascii_players import get_player_ascii
+        
         class_system = ClassSystem()
         
         message = f"\r\n{ANSI.BOLD}=== Estatísticas de {player.name} ==={ANSI.RESET}\r\n\r\n"
+        
+        # Mostra ASCII art do player
+        player_ascii = get_player_ascii(player.class_id, player.race_id)
+        message += f"{ANSI.BRIGHT_CYAN}{player_ascii}{ANSI.RESET}\r\n"
         
         # Classe, Raça e Gênero
         if player.class_id:
@@ -1059,6 +1502,232 @@ class CommandHandler:
                         message += f"  {ANSI.BRIGHT_CYAN}{slot.capitalize()}:{ANSI.RESET} [Item não encontrado]\r\n"
         
         message += f"{ANSI.BRIGHT_MAGENTA}Ouro:{ANSI.RESET} {player.gold}\r\n"
+        await self.send_message(player, message)
+    
+    async def cmd_mapa(self, player: Player):
+        """Comando mapa - mostra um mapa minimalista: sala atual, anterior e próximas"""
+        world = self.world_manager.get_world(player.world_id)
+        if not world:
+            await self.send_message(player, f"{ANSI.RED}Mundo não encontrado.{ANSI.RESET}")
+            return
+        
+        current_room_id = player.room_id
+        if current_room_id not in world.rooms:
+            await self.send_message(player, f"{ANSI.RED}Sala atual não encontrada.{ANSI.RESET}")
+            return
+        
+        current_room = world.rooms[current_room_id]
+        
+        # Coleta salas: atual + salas que levam à atual + salas que a atual leva
+        relevant_rooms = {current_room_id: current_room}
+        
+        # Salas que a atual leva (próximas)
+        for direction, target_room_id in current_room.exits.items():
+            if target_room_id in world.rooms:
+                relevant_rooms[target_room_id] = world.rooms[target_room_id]
+        
+        # Salas que levam à atual (anteriores)
+        for other_room_id, other_room in world.rooms.items():
+            if other_room_id != current_room_id:
+                for direction, target_room_id in other_room.exits.items():
+                    if target_room_id == current_room_id:
+                        relevant_rooms[other_room_id] = other_room
+                        break
+        
+        # Mapeia direções para posições simples
+        direction_positions = {
+            'norte': (1, 0),      # Centro superior
+            'nordeste': (2, 0),
+            'leste': (2, 1),     # Direita
+            'sudeste': (2, 2),
+            'sul': (1, 2),       # Centro inferior
+            'sudoeste': (0, 2),
+            'oeste': (0, 1),     # Esquerda
+            'noroeste': (0, 0),
+            'cima': (1, 0),
+            'baixo': (1, 2),
+        }
+        
+        # Posiciona salas: atual no centro (1,1), outras ao redor
+        room_positions = {current_room_id: (1, 1)}  # Sala atual no centro
+        used_positions = {(1, 1)}
+        
+        # Posiciona salas que a atual leva (próximas)
+        next_index = 0
+        for direction, target_room_id in current_room.exits.items():
+            if target_room_id in relevant_rooms and target_room_id not in room_positions:
+                pos = direction_positions.get(direction, None)
+                if pos and pos not in used_positions:
+                    room_positions[target_room_id] = pos
+                    used_positions.add(pos)
+                else:
+                    # Se a posição já está ocupada, coloca em posição alternativa
+                    alt_positions = [(0, 0), (2, 0), (0, 2), (2, 2), (1, 0), (1, 2), (0, 1), (2, 1)]
+                    for alt_pos in alt_positions:
+                        if alt_pos not in used_positions:
+                            room_positions[target_room_id] = alt_pos
+                            used_positions.add(alt_pos)
+                            break
+        
+        # Posiciona salas que levam à atual (anteriores)
+        for other_room_id, other_room in world.rooms.items():
+            if other_room_id in relevant_rooms and other_room_id not in room_positions:
+                # Procura direção que leva à sala atual
+                for direction, target_room_id in other_room.exits.items():
+                    if target_room_id == current_room_id:
+                        # Posiciona na direção oposta
+                        opposite_directions = {
+                            'norte': 'sul', 'sul': 'norte',
+                            'leste': 'oeste', 'oeste': 'leste',
+                            'nordeste': 'sudoeste', 'sudoeste': 'nordeste',
+                            'sudeste': 'noroeste', 'noroeste': 'sudeste',
+                        }
+                        opposite = opposite_directions.get(direction, 'sul')
+                        pos = direction_positions.get(opposite, (1, 0))
+                        if pos not in used_positions:
+                            room_positions[other_room_id] = pos
+                            used_positions.add(pos)
+                        else:
+                            # Posição alternativa
+                            alt_positions = [(0, 0), (2, 0), (0, 2), (2, 2), (1, 0), (1, 2), (0, 1), (2, 1)]
+                            for alt_pos in alt_positions:
+                                if alt_pos not in used_positions:
+                                    room_positions[other_room_id] = alt_pos
+                                    used_positions.add(alt_pos)
+                                    break
+                        break
+        
+        # Cria grid simples 3x3 (cada célula é 30x3 caracteres)
+        cell_width = 30
+        cell_height = 3
+        grid_width = 3 * cell_width
+        grid_height = 3 * cell_height
+        
+        # Inicializa grid
+        grid = [[' ' for _ in range(grid_width)] for _ in range(grid_height)]
+        
+        # Desenha conexões primeiro
+        for room_id, (x, y) in room_positions.items():
+            if room_id == current_room_id:
+                continue
+            
+            room = relevant_rooms[room_id]
+            base_x = x * cell_width + cell_width // 2
+            base_y = y * cell_height + cell_height // 2
+            center_x = 1 * cell_width + cell_width // 2
+            center_y = 1 * cell_height + cell_height // 2
+            
+            # Desenha linha da sala atual para esta sala
+            if x == 1:  # Mesma coluna (vertical)
+                start_y = min(base_y, center_y)
+                end_y = max(base_y, center_y)
+                for cy in range(start_y, end_y + 1):
+                    if 0 <= cy < grid_height:
+                        if grid[cy][base_x] == ' ':
+                            grid[cy][base_x] = '│'
+            elif y == 1:  # Mesma linha (horizontal)
+                start_x = min(base_x, center_x)
+                end_x = max(base_x, center_x)
+                for cx in range(start_x, end_x + 1):
+                    if 0 <= base_y < grid_height and 0 <= cx < grid_width:
+                        if grid[base_y][cx] == ' ':
+                            grid[base_y][cx] = '─'
+        
+        # Desenha salas
+        for room_id, (x, y) in room_positions.items():
+            room = relevant_rooms[room_id]
+            base_x = x * cell_width
+            base_y = y * cell_height
+            
+            # Monta nome da sala com direção se for uma saída da sala atual
+            display_name = room.name
+            if room_id != current_room_id:
+                # Procura a direção que leva para esta sala
+                direction_to_room = None
+                for direction, target_room_id in current_room.exits.items():
+                    if target_room_id == room_id:
+                        direction_to_room = direction
+                        break
+                
+                # Se não encontrou nas saídas da atual, procura nas salas anteriores
+                if not direction_to_room:
+                    for other_room_id, other_room in world.rooms.items():
+                        if other_room_id != current_room_id:
+                            for direction, target_room_id in other_room.exits.items():
+                                if target_room_id == current_room_id and other_room_id == room_id:
+                                    # Esta sala leva para a atual, então a direção oposta
+                                    opposite_map = {
+                                        'norte': 'sul', 'sul': 'norte',
+                                        'leste': 'oeste', 'oeste': 'leste',
+                                        'nordeste': 'sudoeste', 'sudoeste': 'nordeste',
+                                        'sudeste': 'noroeste', 'noroeste': 'sudeste',
+                                        'noroeste': 'sudeste', 'sudeste': 'noroeste',
+                                        'cima': 'baixo', 'baixo': 'cima',
+                                    }
+                                    direction_to_room = opposite_map.get(direction, direction)
+                                    break
+                
+                if direction_to_room:
+                    # Formata direção de forma mais legível
+                    direction_display = direction_to_room.capitalize()
+                    display_name = f"[{direction_display}] {room.name}"
+            
+            # Nome da sala (truncado se necessário)
+            max_name_len = cell_width - 4
+            room_name = display_name
+            if len(room_name) > max_name_len:
+                truncated = display_name[:max_name_len-2]
+                last_space = truncated.rfind(' ')
+                if last_space > max_name_len // 2:
+                    room_name = truncated[:last_space] + '..'
+                else:
+                    room_name = truncated + '..'
+            
+            name_x = base_x + (cell_width - len(room_name)) // 2
+            
+            # Desenha caixa da sala
+            for cy in range(base_y, min(base_y + cell_height, grid_height)):
+                for cx in range(base_x, min(base_x + cell_width, grid_width)):
+                    if cy == base_y or cy == base_y + cell_height - 1:
+                        if cx == base_x:
+                            grid[cy][cx] = '┌' if cy == base_y else '└'
+                        elif cx == base_x + cell_width - 1:
+                            grid[cy][cx] = '┐' if cy == base_y else '┘'
+                        else:
+                            grid[cy][cx] = '─'
+                    elif cx == base_x or cx == base_x + cell_width - 1:
+                        grid[cy][cx] = '│'
+            
+            # Escreve nome da sala
+            if base_y + 1 < grid_height:
+                for i, char in enumerate(room_name):
+                    if name_x + i < grid_width and name_x + i >= base_x + 1 and name_x + i < base_x + cell_width - 1:
+                        grid[base_y + 1][name_x + i] = char
+            
+            # Marca sala atual
+            if room_id == current_room_id:
+                if base_y + 2 < grid_height and base_x + cell_width // 2 < grid_width:
+                    grid[base_y + 2][base_x + cell_width // 2] = '★'
+        
+        # Constrói string do mapa
+        map_lines = []
+        for row in grid:
+            line = ''.join(row).rstrip()
+            if line.strip():
+                map_lines.append(line)
+        
+        # Monta mensagem
+        message = f"\r\n{ANSI.BOLD}{ANSI.BRIGHT_CYAN}=== Mapa Local ==={ANSI.RESET}\r\n\r\n"
+        message += f"{ANSI.BRIGHT_YELLOW}Legenda:{ANSI.RESET}\r\n"
+        message += f"  {ANSI.BRIGHT_GREEN}★{ANSI.RESET} = Sua localização atual\r\n"
+        message += f"  {ANSI.BRIGHT_CYAN}│ ─{ANSI.RESET} = Caminhos\r\n\r\n"
+        
+        # Adiciona o mapa linha por linha
+        for line in map_lines:
+            message += f"{ANSI.BRIGHT_WHITE}{line}{ANSI.RESET}\r\n"
+        
+        message += f"\r\n{ANSI.BRIGHT_BLACK}Mostrando sala atual e conexões diretas{ANSI.RESET}\r\n"
+        
         await self.send_message(player, message)
     
     def _paginate_list(self, items: List, items_per_page: int = 10) -> List[List]:
@@ -1947,9 +2616,10 @@ class CommandHandler:
             await self.send_message(player, f"\r{ANSI.BRIGHT_GREEN}{damage_icon} Você lança {spell_found.name} em {monster_found.name} causando {actual_damage} de dano! {damage_icon}{ANSI.RESET}\r\n")
             
             # Mostra barra de HP do monstro
-            from mud.utils.visuals import format_hp_bar
-            monster_hp_bar = format_hp_bar(monster_found.current_hp, monster_found.max_hp, f"{monster_found.name} HP")
-            await self.send_message(player, f"{monster_hp_bar}\r\n")
+            from mud.utils.visuals import format_monster_hp_bar, get_hp_color
+            hp_color = get_hp_color(monster_found.current_hp, monster_found.max_hp)
+            monster_hp_display = f"{hp_color}{monster_found.name} HP:{ANSI.RESET} {format_monster_hp_bar(monster_found.current_hp, monster_found.max_hp)}"
+            await self.send_message(player, f"{monster_hp_display}\r\n")
             
             # Monstro revida imediatamente após ser atacado com magia
             if monster_found.is_alive():
@@ -2436,14 +3106,227 @@ class CommandHandler:
         await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você diz:{ANSI.RESET} {message}")
     
     async def cmd_shout(self, player: Player, message: str):
-        """Comando shout - fala globalmente para todos os jogadores"""
+        """Comando shout - fala globalmente para todos os jogadores no canal global"""
         if not message:
             await self.send_message(player, f"{ANSI.YELLOW}Gritar o quê? Use: shout <mensagem>{ANSI.RESET}")
+            return
+        
+        # Verifica se o jogador está no canal global
+        if "global" not in player.channels:
+            await self.send_message(player, f"{ANSI.YELLOW}Você precisa estar no canal global para usar shout.{ANSI.RESET}")
+            await self.send_message(player, f"{ANSI.BRIGHT_CYAN}Use: join global{ANSI.RESET}")
             return
         
         broadcast_msg = f"{ANSI.BRIGHT_MAGENTA}[GLOBAL]{ANSI.RESET} {ANSI.BRIGHT_CYAN}{player.name}{ANSI.RESET} grita: {message}"
         await self.game.broadcast_global(broadcast_msg)
         await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você grita:{ANSI.RESET} {message}")
+    
+    async def cmd_join(self, player: Player, channel_name: str):
+        """Comando join - entra em um canal"""
+        if not channel_name:
+            await self.send_message(player, f"{ANSI.YELLOW}Entrar em qual canal? Use: join <canal>{ANSI.RESET}")
+            await self.send_message(player, f"{ANSI.BRIGHT_CYAN}Canais disponíveis: global{ANSI.RESET}")
+            return
+        
+        channel_name = channel_name.lower().strip()
+        
+        # Canais disponíveis
+        available_channels = ["global"]
+        
+        if channel_name not in available_channels:
+            await self.send_message(player, f"{ANSI.RED}Canal '{channel_name}' não existe.{ANSI.RESET}")
+            await self.send_message(player, f"{ANSI.BRIGHT_CYAN}Canais disponíveis: {', '.join(available_channels)}{ANSI.RESET}")
+            return
+        
+        # Canal local sempre está ativo, não pode fazer join
+        if channel_name == "local":
+            await self.send_message(player, f"{ANSI.YELLOW}O canal 'local' sempre está ativo. Você já está nele!{ANSI.RESET}")
+            return
+        
+        # Verifica se já está no canal
+        if channel_name in player.channels:
+            await self.send_message(player, f"{ANSI.YELLOW}Você já está no canal '{channel_name}'.{ANSI.RESET}")
+            return
+        
+        # Adiciona ao canal
+        player.channels.append(channel_name)
+        await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você entrou no canal '{channel_name}'.{ANSI.RESET}")
+        
+        # Conta quantos jogadores estão no canal global
+        if channel_name == "global":
+            global_count = sum(1 for p in self.game.players.values() if "global" in p.channels)
+            await self.send_message(player, f"{ANSI.BRIGHT_CYAN}Jogadores no canal global: {global_count}{ANSI.RESET}")
+    
+    async def cmd_leave(self, player: Player, channel_name: str):
+        """Comando leave - sai de um canal"""
+        if not channel_name:
+            await self.send_message(player, f"{ANSI.YELLOW}Sair de qual canal? Use: leave <canal>{ANSI.RESET}")
+            await self.send_message(player, f"{ANSI.BRIGHT_CYAN}Você está nos canais: {', '.join(player.channels)}{ANSI.RESET}")
+            return
+        
+        channel_name = channel_name.lower().strip()
+        
+        # Não pode sair do canal local
+        if channel_name == "local":
+            await self.send_message(player, f"{ANSI.YELLOW}Você não pode sair do canal 'local'. Ele sempre está ativo.{ANSI.RESET}")
+            return
+        
+        # Verifica se está no canal
+        if channel_name not in player.channels:
+            await self.send_message(player, f"{ANSI.YELLOW}Você não está no canal '{channel_name}'.{ANSI.RESET}")
+            return
+        
+        # Remove do canal
+        player.channels.remove(channel_name)
+        await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você saiu do canal '{channel_name}'.{ANSI.RESET}")
+    
+    async def cmd_channels(self, player: Player):
+        """Comando channels - lista canais disponíveis e canais que o jogador está inscrito"""
+        available_channels = {
+            "local": "Canal padrão - sempre ativo. Mensagens da sua sala atual.",
+            "global": "Canal global - precisa fazer join. Mensagens de todos os jogadores online."
+        }
+        
+        message = f"\r\n{ANSI.BOLD}=== Canais de Chat ==={ANSI.RESET}\r\n\r\n"
+        
+        # Lista canais disponíveis
+        message += f"{ANSI.BRIGHT_CYAN}Canais Disponíveis:{ANSI.RESET}\r\n"
+        for channel_id, description in available_channels.items():
+            status = ""
+            if channel_id in player.channels:
+                status = f" {ANSI.BRIGHT_GREEN}[INSCRITO]{ANSI.RESET}"
+            elif channel_id == "local":
+                status = f" {ANSI.BRIGHT_GREEN}[ATIVO]{ANSI.RESET}"
+            
+            message += f"  {ANSI.BRIGHT_YELLOW}{channel_id.upper()}{ANSI.RESET}{status}\r\n"
+            message += f"    {ANSI.BRIGHT_BLACK}→{ANSI.RESET} {description}\r\n\r\n"
+        
+        # Lista canais que o jogador está inscrito
+        message += f"{ANSI.BRIGHT_GREEN}Seus Canais Ativos:{ANSI.RESET}\r\n"
+        for channel in player.channels:
+            message += f"  {ANSI.BRIGHT_CYAN}•{ANSI.RESET} {channel.upper()}\r\n"
+        
+        message += f"\r\n{ANSI.BRIGHT_YELLOW}Comandos:{ANSI.RESET}\r\n"
+        message += f"  {ANSI.BRIGHT_CYAN}join <canal>{ANSI.RESET} - Entra em um canal\r\n"
+        message += f"  {ANSI.BRIGHT_CYAN}leave <canal>{ANSI.RESET} - Sai de um canal\r\n"
+        message += f"  {ANSI.BRIGHT_CYAN}say <mensagem>{ANSI.RESET} - Fala no canal local\r\n"
+        message += f"  {ANSI.BRIGHT_CYAN}shout <mensagem>{ANSI.RESET} - Fala no canal global (requer join)\r\n"
+        
+        await self.send_message(player, message)
+    
+    async def cmd_inspect(self, player: Player, target_name: str):
+        """Comando inspect - visualiza equipamentos e estatísticas de outro jogador"""
+        if not target_name:
+            await self.send_message(player, f"{ANSI.YELLOW}Inspecionar quem? Use: inspect <nome do jogador>{ANSI.RESET}")
+            return
+        
+        target_name = target_name.strip()
+        
+        # Verifica se é o próprio jogador
+        if target_name.lower() == player.name.lower():
+            await self.send_message(player, f"{ANSI.YELLOW}Use 'stats' para ver suas próprias estatísticas.{ANSI.RESET}")
+            return
+        
+        # Busca jogadores na mesma sala
+        players_in_room = self.game.get_players_in_room(player.world_id, player.room_id)
+        target_player = None
+        
+        for p in players_in_room:
+            if p.name.lower() == target_name.lower():
+                target_player = p
+                break
+        
+        if not target_player:
+            await self.send_message(player, f"{ANSI.RED}Jogador '{target_name}' não está nesta sala.{ANSI.RESET}")
+            return
+        
+        # Cria mensagem de inspeção
+        from mud.systems.classes import ClassSystem
+        class_system = ClassSystem()
+        
+        message = f"\r\n{ANSI.BOLD}=== Inspeção de {target_player.name} ==={ANSI.RESET}\r\n\r\n"
+        
+        # Classe, Raça e Gênero
+        if target_player.class_id:
+            cls = class_system.get_class(target_player.class_id)
+            if cls:
+                message += f"{cls.icon} {ANSI.BRIGHT_GREEN}Classe:{ANSI.RESET} {cls.name}\r\n"
+        if target_player.race_id:
+            race = class_system.get_race(target_player.race_id)
+            if race:
+                message += f"{race.icon} {ANSI.BRIGHT_GREEN}Raça:{ANSI.RESET} {race.name}\r\n"
+        if target_player.gender_id:
+            gender = class_system.get_gender(target_player.gender_id)
+            if gender:
+                message += f"{gender.icon} {ANSI.BRIGHT_GREEN}Gênero:{ANSI.RESET} {gender.name}\r\n"
+        
+        message += f"\r\n{ANSI.BOLD}Atributos:{ANSI.RESET}\r\n"
+        message += f"{ANSI.BRIGHT_GREEN}Nível:{ANSI.RESET} {target_player.level}/30\r\n"
+        
+        # Barras visuais
+        from mud.utils.visuals import format_hp_bar, format_stamina_bar
+        message += f"{format_hp_bar(target_player.current_hp, target_player.max_hp)}\r\n"
+        message += f"{format_stamina_bar(target_player.current_stamina, target_player.max_stamina)}\r\n"
+        
+        # Stats com equipamento
+        total_attack = target_player.get_total_attack(self.game_data)
+        total_defense = target_player.get_total_defense(self.game_data)
+        
+        if total_attack > target_player.attack or total_defense > target_player.defense:
+            # Mostra stats base e total
+            attack_bonus = total_attack - target_player.attack
+            defense_bonus = total_defense - target_player.defense
+            message += f"{ANSI.BRIGHT_CYAN}Ataque:{ANSI.RESET} {target_player.attack}"
+            if attack_bonus > 0:
+                message += f" {ANSI.BRIGHT_GREEN}(+{attack_bonus} equipamento) = {total_attack}{ANSI.RESET}\r\n"
+            else:
+                message += "\r\n"
+            
+            message += f"{ANSI.BRIGHT_BLUE}Defesa:{ANSI.RESET} {target_player.defense}"
+            if defense_bonus > 0:
+                message += f" {ANSI.BRIGHT_GREEN}(+{defense_bonus} equipamento) = {total_defense}{ANSI.RESET}\r\n"
+            else:
+                message += "\r\n"
+        else:
+            message += f"{ANSI.BRIGHT_CYAN}Ataque:{ANSI.RESET} {total_attack}\r\n"
+            message += f"{ANSI.BRIGHT_BLUE}Defesa:{ANSI.RESET} {total_defense}\r\n"
+        
+        # Mostra equipamento
+        if target_player.equipment:
+            message += f"\r\n{ANSI.BOLD}Equipamento:{ANSI.RESET}\r\n"
+            for slot, item_id in target_player.equipment.items():
+                if item_id:
+                    item = self.game_data.get_item(item_id)
+                    if item:
+                        rarity_color = item.get_rarity_color()
+                        message += f"  {ANSI.BRIGHT_CYAN}{slot.capitalize()}:{ANSI.RESET} {rarity_color}{item.name}{ANSI.RESET}"
+                        # Mostra stats do item se tiver
+                        if item.stats:
+                            stats_str = []
+                            if item.stats.get('attack', 0) > 0:
+                                stats_str.append(f"+{item.stats['attack']} ATK")
+                            if item.stats.get('defense', 0) > 0:
+                                stats_str.append(f"+{item.stats['defense']} DEF")
+                            if item.stats.get('hp', 0) > 0:
+                                stats_str.append(f"+{item.stats['hp']} HP")
+                            if stats_str:
+                                message += f" {ANSI.BRIGHT_BLACK}({', '.join(stats_str)}){ANSI.RESET}"
+                        message += "\r\n"
+                    else:
+                        message += f"  {ANSI.BRIGHT_CYAN}{slot.capitalize()}:{ANSI.RESET} [Item não encontrado]\r\n"
+        else:
+            message += f"\r\n{ANSI.YELLOW}Nenhum equipamento.{ANSI.RESET}\r\n"
+        
+        # Status de combate
+        if target_player.name in self.in_combat:
+            message += f"\r\n{ANSI.RED}⚔️ [EM COMBATE]{ANSI.RESET}\r\n"
+        
+        # Status AFK
+        if hasattr(target_player, 'is_afk') and target_player.is_afk:
+            afk_msg = getattr(target_player, 'afk_message', 'AFK')
+            message += f"\r\n{ANSI.BRIGHT_BLACK}💤 [AFK: {afk_msg}]{ANSI.RESET}\r\n"
+        
+        await self.send_message(player, message)
     
     async def cmd_who(self, player: Player):
         """Comando who - lista jogadores online com detalhes"""
@@ -2499,15 +3382,55 @@ class CommandHandler:
             npc = self.game_data.get_npc(player.world_id, npc_id)
             if npc and npc_name.lower() in npc.name.lower():
                 if npc.npc_type == 'shopkeeper' and npc.shop_items:
-                    message = f"\r\n{ANSI.BOLD}=== Loja de {npc.name} ==={ANSI.RESET}\r\n"
+                    message = f"\r\n{Colors.TITLE}=== Loja de {npc.name} ==={Colors.RESET}\r\n\r\n"
+                    
+                    # Agrupa itens por tipo para melhor organização
+                    potions = []
+                    equipment = []
+                    other = []
+                    
                     for shop_item in npc.shop_items:
                         item_id = shop_item.get('item_id') if isinstance(shop_item, dict) else shop_item
                         price = shop_item.get('price', 0) if isinstance(shop_item, dict) else 0
                         item = self.game_data.get_item(item_id)
                         if item:
-                            message += f"{ANSI.BRIGHT_CYAN}{item.name}{ANSI.RESET} - {ANSI.BRIGHT_YELLOW}{price} moedas{ANSI.RESET}\r\n"
-                            message += f"  {item.description}\r\n"
-                    message += f"\r\n{ANSI.BRIGHT_GREEN}Use: buy <item> <npc> para comprar{ANSI.RESET}\r\n"
+                            item_data = (item, price)
+                            item_name_lower = item.name.lower()
+                            if 'poção' in item_name_lower or 'pocao' in item_name_lower:
+                                potions.append(item_data)
+                            elif any(x in item_name_lower for x in ['espada', 'armadura', 'escudo', 'arma', 'armor']):
+                                equipment.append(item_data)
+                            else:
+                                other.append(item_data)
+                    
+                    # Mostra poções primeiro
+                    if potions:
+                        message += f"{Colors.CATEGORY}Poções:{Colors.RESET}\r\n"
+                        for item, price in potions:
+                            message += f"  {Colors.ITEM}{item.name}{Colors.RESET} - {Colors.VALUE}{price} moedas{Colors.RESET}\r\n"
+                            if item.description:
+                                message += f"    {Colors.DESCRIPTION}{item.description}{Colors.RESET}\r\n"
+                        message += "\r\n"
+                    
+                    # Mostra equipamentos
+                    if equipment:
+                        message += f"{Colors.CATEGORY}Equipamentos:{Colors.RESET}\r\n"
+                        for item, price in equipment:
+                            message += f"  {Colors.ITEM}{item.name}{Colors.RESET} - {Colors.VALUE}{price} moedas{Colors.RESET}\r\n"
+                            if item.description:
+                                message += f"    {Colors.DESCRIPTION}{item.description}{Colors.RESET}\r\n"
+                        message += "\r\n"
+                    
+                    # Mostra outros itens
+                    if other:
+                        message += f"{Colors.CATEGORY}Outros:{Colors.RESET}\r\n"
+                        for item, price in other:
+                            message += f"  {Colors.ITEM}{item.name}{Colors.RESET} - {Colors.VALUE}{price} moedas{Colors.RESET}\r\n"
+                            if item.description:
+                                message += f"    {Colors.DESCRIPTION}{item.description}{Colors.RESET}\r\n"
+                        message += "\r\n"
+                    
+                    message += f"{Colors.ACTION}Use: buy <item> <npc> para comprar{Colors.RESET}\r\n"
                     await self.send_message(player, message)
                     return
                 elif npc.npc_type == 'trader':
@@ -3545,11 +4468,12 @@ class CommandHandler:
                 f"{ANSI.YELLOW}Você já está no Hall de Entrada!{ANSI.RESET}")
             return
         
-        old_room_id = player.room_id
-        
-        # Remove de combate se estiver
+        # Verifica se o jogador está em combate
         if player.name in self.in_combat:
-            del self.in_combat[player.name]
+            await self.send_message(player, f"{ANSI.RED}Você está em combate! Não pode sair da sala até o combate acabar.{ANSI.RESET}")
+            return
+        
+        old_room_id = player.room_id
         
         # Teletransporta para o lobby
         player.room_id = "lobby"
@@ -3732,7 +4656,14 @@ class CommandHandler:
     async def send_message(self, player: Player, message: str):
         """Envia mensagem para um jogador"""
         try:
-            player.writer.write(f"{message}\n".encode())
+            # Remove qualquer quebra de linha no final
+            message = message.rstrip('\r\n')
+            
+            # Limpa a linha atual antes de enviar a mensagem
+            # Isso evita que mensagens apareçam no meio da linha quando o jogador está digitando
+            # Sequência ANSI: \r volta ao início da linha, \033[K limpa até o final da linha
+            clear_line = "\r\033[K"
+            player.writer.write(f"{clear_line}{message}\r\n".encode())
             await player.writer.drain()
         except:
             pass

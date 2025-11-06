@@ -85,7 +85,8 @@ class MUDGame:
             equipped_spells=stats.get('equipped_spells', []),
             active_perks=stats.get('active_perks', []),
             spell_cooldowns=stats.get('spell_cooldowns', {}),
-            unspent_points=stats.get('unspent_points', 0)
+            unspent_points=stats.get('unspent_points', 0),
+            channels=stats.get('channels', ["local"])  # Canal local sempre ativo por padrão
         )
         self.players[name] = player
         self.player_connections.add(writer)
@@ -105,18 +106,35 @@ class MUDGame:
             if exclude_player and player.name == exclude_player:
                 continue
             try:
-                player.writer.write(f"{message}\n".encode())
+                # Remove qualquer quebra de linha no final
+                message_clean = message.rstrip('\r\n')
+                
+                # Limpa a linha atual antes de enviar a mensagem
+                # Isso evita que mensagens apareçam no meio da linha quando o jogador está digitando
+                # Sequência ANSI: \r volta ao início da linha, \033[K limpa até o final da linha
+                clear_line = "\r\033[K"
+                player.writer.write(f"{clear_line}{message_clean}\r\n".encode())
                 await player.writer.drain()
             except:
                 pass
     
     async def broadcast_global(self, message: str, exclude_player: Optional[str] = None):
-        """Envia mensagem para todos os jogadores online (chat global)"""
+        """Envia mensagem para todos os jogadores online que estão no canal global"""
         for player in self.players.values():
             if exclude_player and player.name == exclude_player:
                 continue
+            # Só envia para jogadores que estão no canal global
+            if "global" not in player.channels:
+                continue
             try:
-                player.writer.write(f"{message}\n".encode())
+                # Remove qualquer quebra de linha no final
+                message_clean = message.rstrip('\r\n')
+                
+                # Limpa a linha atual antes de enviar a mensagem
+                # Isso evita que mensagens apareçam no meio da linha quando o jogador está digitando
+                # Sequência ANSI: \r volta ao início da linha, \033[K limpa até o final da linha
+                clear_line = "\r\033[K"
+                player.writer.write(f"{clear_line}{message_clean}\r\n".encode())
                 await player.writer.drain()
             except:
                 pass
@@ -126,7 +144,7 @@ async def select_world(writer: asyncio.StreamWriter, reader: asyncio.StreamReade
     worlds = world_manager.list_worlds()
     
     if not worlds:
-        writer.write(f"{ANSI.RED}Erro: Nenhum mundo disponível.{ANSI.RESET}\n".encode())
+        writer.write(f"{ANSI.RED}Erro: Nenhum mundo disponível.{ANSI.RESET}\r\n".encode())
         await writer.drain()
         return None
     
@@ -162,12 +180,12 @@ async def select_world(writer: asyncio.StreamWriter, reader: asyncio.StreamReade
                 return world['id']
         
         # Se não encontrou, usa o padrão
-        writer.write(f"{ANSI.YELLOW}Escolha inválida. Usando mundo padrão.{ANSI.RESET}\n".encode())
+        writer.write(f"{ANSI.YELLOW}Escolha inválida. Usando mundo padrão.{ANSI.RESET}\r\n".encode())
         await writer.drain()
         return worlds[0]['id'] if worlds else None
     
     except asyncio.TimeoutError:
-        writer.write(f"{ANSI.RED}Tempo esgotado. Usando mundo padrão.{ANSI.RESET}\n".encode())
+        writer.write(f"{ANSI.RED}Tempo esgotado. Usando mundo padrão.{ANSI.RESET}\r\n".encode())
         await writer.drain()
         return worlds[0]['id'] if worlds else None
 
@@ -235,7 +253,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             
             # Verifica se mundo ainda existe
             if not world_manager.get_world(world_id):
-                writer.write(f"{ANSI.YELLOW}Seu mundo anterior não existe mais. Escolha um novo:{ANSI.RESET}\n".encode())
+                writer.write(f"{ANSI.YELLOW}Seu mundo anterior não existe mais. Escolha um novo:{ANSI.RESET}\r\n".encode())
                 await writer.drain()
                 world_id = await select_world(writer, reader, world_manager)
                 if not world_id:
@@ -439,7 +457,9 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         
         # Loop principal de comandos
         while True:
-            prompt = f"{ANSI.BRIGHT_GREEN}>{ANSI.RESET} "
+            # Sempre envia \r\n antes do prompt para garantir que o cliente MUD
+            # reconheça o final da linha e reposicione corretamente o cursor
+            prompt = f"\r\n{ANSI.BRIGHT_GREEN}>{ANSI.RESET} "
             writer.write(prompt.encode())
             await writer.drain()
             
@@ -462,7 +482,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             except asyncio.TimeoutError:
                 # Só desconecta se não estiver AFK
                 if not (hasattr(player, 'is_afk') and player.is_afk):
-                    writer.write(f"\n{ANSI.YELLOW}Tempo de inatividade excedido. Desconectando...{ANSI.RESET}\n".encode())
+                    writer.write(f"\r\n{ANSI.YELLOW}Tempo de inatividade excedido. Desconectando...{ANSI.RESET}\r\n".encode())
                     break
                 # Se estiver AFK, continua o loop (não desconecta)
                 continue
@@ -470,7 +490,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
     except asyncio.TimeoutError:
         # Só desconecta se não estiver AFK
         if 'player' in locals() and not (hasattr(player, 'is_afk') and player.is_afk):
-            writer.write(f"\n{ANSI.YELLOW}Tempo de inatividade excedido. Desconectando...{ANSI.RESET}\n".encode())
+            writer.write(f"\r\n{ANSI.YELLOW}Tempo de inatividade excedido. Desconectando...{ANSI.RESET}\r\n".encode())
     except Exception as e:
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Erro com {addr}: {e}")
     finally:
@@ -504,7 +524,8 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             'equipped_spells': player.equipped_spells,
             'active_perks': player.active_perks,
             'spell_cooldowns': player.spell_cooldowns,
-            'unspent_points': player.unspent_points
+            'unspent_points': player.unspent_points,
+            'channels': player.channels if hasattr(player, 'channels') else ["local"]
         }
             database.update_player_stats(player.name, stats)
             game.remove_player(player.name)
@@ -664,7 +685,8 @@ async def main():
                                 'equipped_spells': player.equipped_spells,
                                 'active_perks': player.active_perks,
                                 'spell_cooldowns': player.spell_cooldowns,
-                                'unspent_points': player.unspent_points
+                                'unspent_points': player.unspent_points,
+                                'channels': player.channels if hasattr(player, 'channels') else ["local"]
                             }
                             database.update_player_stats(player.name, stats)
                         except Exception as e:

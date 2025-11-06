@@ -34,7 +34,7 @@ class CombatSystem:
             f"\r{ANSI.BRIGHT_GREEN}⚔ Você ataca {monster.name}{level_info} causando {actual_damage} de dano! 💥{ANSI.RESET}\r\n"
         )
         
-        # Mostra barra de HP do monstro
+        # Mostra barra de HP do monstro (usa format_hp_bar que já tem cores consistentes)
         monster_hp_bar = format_hp_bar(monster.current_hp, monster.max_hp, f"{monster.name} HP")
         await send_message_func(f"{monster_hp_bar}\r\n")
         
