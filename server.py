@@ -356,12 +356,15 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             exclude_player=player_name
         )
         
-        # Mostra lore do mundo se for novo jogador (opcional)
+        # Cria handler de comandos
         handler = CommandHandler(game, world_manager, database, game_data, lore_manager, quest_manager, world_lore_manager, dungeon_manager)
         
-        # Verifica se é novo jogador (primeira vez conectando)
-        is_new_player = not player_data or not player_data.get('stats', {}).get('has_seen_lore', False)
+        # Verifica se é novo jogador (primeira vez conectando) - APENAS se nunca viu a lore
+        player_stats = player_data.get('stats', {}) if player_data else {}
+        has_seen_lore = player_stats.get('has_seen_lore', False)
+        is_new_player = not has_seen_lore
         
+        # Mostra lore APENAS se for a primeira vez
         if is_new_player:
             lore_text = world_lore_manager.format_world_lore(player.world_id)
             if lore_text:
@@ -376,13 +379,52 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
                     pass
                 
                 # Marca como tendo visto a lore
-                if player_data:
-                    stats = player_data.get('stats', {})
-                    stats['has_seen_lore'] = True
-                    database.update_player_stats(player_name, stats)
+                # Atualiza também no objeto player
+                if player:
+                    player.stats['has_seen_lore'] = True
+                
+                # Salva no banco de dados
+                current_player_data = database.get_player(player_name)
+                if current_player_data:
+                    current_stats = current_player_data.get('stats', {}).copy()
+                    current_stats['has_seen_lore'] = True
+                    database.update_player_stats(player_name, current_stats)
+                else:
+                    # Se não existe ainda, cria stats básicos
+                    new_stats = {'has_seen_lore': True}
+                    database.update_player_stats(player_name, new_stats)
         
-        welcome_player_msg = f"\r\n{ANSI.BOLD}{ANSI.BRIGHT_GREEN}Bem-vindo, {ANSI.BRIGHT_CYAN}{player_name}{ANSI.RESET}{ANSI.BRIGHT_GREEN}!{ANSI.RESET}\r\n"
-        await handler.send_message(player, welcome_player_msg)
+        # Mensagem de boas-vindas ao servidor
+        # Conta players online (incluindo o que acabou de conectar)
+        online_count = len(game.players)
+        developers = ["Luan Schons Griebler"]
+        
+        # Calcula espaçamento para centralizar melhor
+        title = "Bem-vindo ao OpenMud Dungeon Server!"
+        greeting = f"Olá, {player_name}!"
+        online_text = f"Jogadores Online: {online_count}"
+        dev_text = ", ".join(developers)
+        dev_line = f"Desenvolvido por: {dev_text}"
+        
+        max_width = 58
+        title_pad = (max_width - len(title)) // 2
+        greeting_pad = (max_width - len(greeting)) // 2
+        online_pad = (max_width - len(online_text)) // 2
+        dev_pad = (max_width - len(dev_line)) // 2
+        
+        welcome_banner = f"\r\n{ANSI.BOLD}{ANSI.BRIGHT_CYAN}{'═' * 60}{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * 58}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * title_pad}{ANSI.BRIGHT_CYAN}{title}{ANSI.RESET}{' ' * (max_width - len(title) - title_pad)}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * 58}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * greeting_pad}{ANSI.BRIGHT_YELLOW}{greeting}{ANSI.RESET}{' ' * (max_width - len(greeting) - greeting_pad)}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * 58}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * online_pad}{ANSI.BRIGHT_WHITE}Jogadores Online: {ANSI.BRIGHT_GREEN}{online_count}{ANSI.RESET}{' ' * (max_width - len(online_text) - online_pad)}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * 58}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * dev_pad}{ANSI.BRIGHT_MAGENTA}{dev_line}{ANSI.RESET}{' ' * (max_width - len(dev_line) - dev_pad)}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}{' ' * 58}{ANSI.BOLD}{ANSI.BRIGHT_GREEN}║{ANSI.RESET}\r\n"
+        welcome_banner += f"{ANSI.BOLD}{ANSI.BRIGHT_CYAN}{'═' * 60}{ANSI.RESET}\r\n\r\n"
+        
+        await handler.send_message(player, welcome_banner)
         await handler.cmd_look(player)
         help_hint = f"{ANSI.BRIGHT_YELLOW}Digite 'help' para ver os comandos disponíveis.{ANSI.RESET}\r\n"
         await handler.send_message(player, help_hint)

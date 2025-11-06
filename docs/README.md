@@ -1,5 +1,9 @@
 # Documentação do OpenMud MUD
 
+<div align="center">
+  <img src="openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 Bem-vindo à documentação do OpenMud MUD. Aqui você encontrará guias detalhados sobre como usar e expandir o jogo.
 
 ## Índice

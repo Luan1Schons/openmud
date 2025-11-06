@@ -1,5 +1,9 @@
 # Como Funcionam as Quests Geradas pela IA
 
+<div align="center">
+  <img src="openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 ## ✅ Vinculação com NPCs (IMPLEMENTADO)
 
 ### Como Funciona

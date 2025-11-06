@@ -1,5 +1,9 @@
 # Sistema de Respawn de Monstros
 
+<div align="center">
+  <img src="openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 ## Visão Geral
 
 O sistema de respawn controla quando monstros podem reaparecer após serem mortos. Cada monstro tem um tempo de respawn configurável que é salvo no banco de dados.

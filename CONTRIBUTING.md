@@ -1,5 +1,9 @@
 # Guia de Contribuição
 
+<div align="center">
+  <img src="docs/openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 Obrigado por considerar contribuir com o OpenMud MUD! Este documento fornece diretrizes para contribuir com o projeto.
 
 ## Como Contribuir

@@ -1,5 +1,9 @@
 # Expansão do Mundo de Eldoria
 
+<div align="center">
+  <img src="openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 ## Resumo da Expansão
 
 Este documento resume o conteúdo adicional gerado para expandir o mundo de Eldoria, criando mais salas, monstros, NPCs, itens e quests que se integram perfeitamente ao contexto existente.

@@ -1,5 +1,9 @@
 # Código de Conduta do Contribuidor
 
+<div align="center">
+  <img src="docs/openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 ## Nosso Compromisso
 
 No interesse de fomentar um ambiente aberto e acolhedor, nós, como contribuidores e mantenedores, nos comprometemos a tornar a participação em nosso projeto e em nossa comunidade uma experiência livre de assédio para todos, independentemente de idade, tamanho corporal, deficiência, etnia, características sexuais, identidade e expressão de gênero, nível de experiência, educação, status socioeconômico, nacionalidade, aparência pessoal, raça, religião ou identidade e orientação sexual.

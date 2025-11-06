@@ -1,5 +1,9 @@
 # Como Conectar ao MUD
 
+<div align="center">
+  <img src="openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 ## Método 1: Usando o Script (Recomendado)
 
 ```bash

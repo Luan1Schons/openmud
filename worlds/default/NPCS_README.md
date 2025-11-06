@@ -1,5 +1,9 @@
 # Guia de Criação de NPCs
 
+<div align="center">
+  <img src="../../docs/openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 Os NPCs são definidos no arquivo `worlds/default/npcs.json`.
 
 ## Estrutura Básica

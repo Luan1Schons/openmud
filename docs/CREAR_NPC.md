@@ -1,5 +1,9 @@
 # Como Criar Novos NPCs
 
+<div align="center">
+  <img src="openmud.png" alt="OpenMud Logo" width="400">
+</div>
+
 ## Localização
 
 Os NPCs são criados no arquivo:
