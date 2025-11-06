@@ -1227,6 +1227,16 @@ class CommandHandler:
                     message += f"{ANSI.WHITE}{random.choice(npc.dialogue)}{ANSI.RESET}\r\n"
                 if npc.lore:
                     message += f"\r\n{ANSI.BRIGHT_MAGENTA}{npc.lore}{ANSI.RESET}\r\n"
+                
+                # Se o NPC é um quest_giver, menciona as quests disponíveis
+                if npc.npc_type == 'quest_giver' or npc.quests:
+                    quests = self.quest_manager.get_quests_by_npc(player.world_id, npc_id)
+                    if quests:
+                        available_quests = [q for q in quests if q.id not in player.completed_quests]
+                        if available_quests:
+                            message += f"\r\n{ANSI.BRIGHT_YELLOW}{npc.name} tem quests disponíveis!{ANSI.RESET}\r\n"
+                            message += f"{ANSI.BRIGHT_GREEN}Use: quest {npc.name} para ver as quests{ANSI.RESET}\r\n"
+                
                 await self.send_message(player, message)
                 return
         
