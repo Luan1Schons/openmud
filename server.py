@@ -174,7 +174,17 @@ async def select_world(writer: asyncio.StreamWriter, reader: asyncio.StreamReade
 async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, game: MUDGame, world_manager: WorldManager, database: Database, game_data, lore_manager, quest_manager, class_system: ClassSystem, world_lore_manager: WorldLoreManager, dungeon_manager: DungeonManager):
     """Gerencia conexão de um cliente"""
     addr = writer.get_extra_info('peername')
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Nova conexão de {addr}")
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Nova conexão TCP recebida de {addr}")
+    
+    # Envia uma mensagem de boas-vindas imediata para testar a conexão
+    try:
+        welcome_msg = f"{ANSI.BRIGHT_GREEN}Bem-vindo ao OpenMud MUD!{ANSI.RESET}\r\n"
+        writer.write(welcome_msg.encode())
+        await writer.drain()
+    except Exception as e:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Erro ao enviar mensagem de boas-vindas: {e}")
+        writer.close()
+        return
     
     try:
         # Autenticação (login/registro)
@@ -566,14 +576,35 @@ async def main():
     print(f"\nPressione Ctrl+C para encerrar")
     print("=" * 50)
     
-    server = await asyncio.start_server(
-        lambda r, w: handle_client(r, w, game, world_manager, database, game_data, lore_manager, quest_manager, class_system, world_lore_manager, dungeon_manager),
-        HOST,
-        PORT
-    )
-    
-    async with server:
-        await server.serve_forever()
+    try:
+        print(f"\n[DEBUG] Iniciando servidor TCP em {HOST}:{PORT}...")
+        server = await asyncio.start_server(
+            lambda r, w: handle_client(r, w, game, world_manager, database, game_data, lore_manager, quest_manager, class_system, world_lore_manager, dungeon_manager),
+            HOST,
+            PORT
+        )
+        
+        # Obtém endereços onde o servidor está escutando
+        addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
+        print(f"\n✓ Servidor escutando em: {addrs}")
+        print(f"✓ Aceitando conexões TCP em {HOST}:{PORT}")
+        print(f"✓ Servidor pronto para receber conexões!\n")
+        
+        async with server:
+            await server.serve_forever()
+    except OSError as e:
+        print(f"\n✗ ERRO: Não foi possível iniciar o servidor na porta {PORT}")
+        print(f"   Erro: {e}")
+        print(f"\n   Possíveis causas:")
+        print(f"   - Porta {PORT} já está em uso")
+        print(f"   - Permissões insuficientes")
+        print(f"   - Firewall bloqueando a porta")
+        raise
+    except Exception as e:
+        print(f"\n✗ ERRO ao iniciar servidor: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
 
 if __name__ == '__main__':
     try:
