@@ -145,7 +145,7 @@
       }
     ],
     "rewards": {
-      "gold": 800,
+      "gold": 500,
       "experience": 300,
       "items": ["potion_hp_large", "potion_mana_large"]
     },
@@ -217,7 +217,7 @@
       }
     ],
     "rewards": {
-      "gold": 1000,
+      "gold": 500,
       "experience": 500,
       "items": ["exotic_herb", "desert_pearl"]
     },
@@ -255,7 +255,7 @@
       }
     ],
     "rewards": {
-      "gold": 1000,
+      "gold": 500,
       "experience": 300,
       "items": ["desert_rose", "oasis_water"]
     },
@@ -303,7 +303,7 @@
       }
     ],
     "rewards": {
-      "gold": 1500,
+      "gold": 500,
       "experience": 700,
       "items": ["pharaoh_gold", "ancient_scarab"]
     },
@@ -432,7 +432,7 @@
       }
     ],
     "rewards": {
-      "gold": 1200,
+      "gold": 700,
       "experience": 800,
       "items": ["dragon_scale", "potion_hp_large", "potion_mana_large"]
     },
@@ -451,7 +451,7 @@
       }
     ],
     "rewards": {
-      "gold": 700,
+      "gold": 300,
       "experience": 400,
       "items": ["bow_elven", "seed_magic"]
     },
@@ -475,7 +475,7 @@
       }
     ],
     "rewards": {
-      "gold": 900,
+      "gold": 400,
       "experience": 500,
       "items": ["bow_elven", "ancient_wood"]
     },
@@ -523,7 +523,7 @@
       }
     ],
     "rewards": {
-      "gold": 1500,
+      "gold": 600,
       "experience": 700,
       "items": ["sword_steel", "potion_hp_large"]
     },
@@ -571,7 +571,7 @@
       }
     ],
     "rewards": {
-      "gold": 700,
+      "gold": 400,
       "experience": 450,
       "items": ["essence_light", "book_magic"]
     },
@@ -643,8 +643,8 @@
       }
     ],
     "rewards": {
-      "gold": 1800,
-      "experience": 900,
+      "gold": 500,
+      "experience": 300,
       "items": ["ancient_wood", "seed_magic", "potion_hp_large"]
     },
     "giver_npc": "quest_giver_forest"
