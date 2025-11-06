@@ -29,9 +29,24 @@ Configure no Railway:
 ## Configuração no Railway
 
 1. **Conecte seu repositório** ao Railway
-2. **Configure as variáveis de ambiente** (se necessário):
+2. **Configure o Builder**: 
+   - Se usar Dockerfile: O Railway detectará automaticamente
+   - Se usar Nixpacks: O Railway usará o `nixpacks.toml`
+3. **Configure as variáveis de ambiente** (se necessário):
    - `PORT`: Será definido automaticamente pelo Railway
-3. **Deploy**: O Railway detectará automaticamente que é um projeto Python
+4. **Deploy**: O Railway fará o build e deploy automaticamente
+
+## Resolução de Problemas de Build
+
+Se o build falhar com erro de `pip: command not found`:
+
+1. **Opção 1: Usar Dockerfile** (recomendado)
+   - O arquivo `Dockerfile` já está incluído no projeto
+   - O Railway detectará automaticamente
+
+2. **Opção 2: Corrigir Nixpacks**
+   - O arquivo `nixpacks.toml` já está configurado corretamente
+   - Se ainda houver problemas, force o uso do Dockerfile nas configurações do Railway
 
 ## Verificando se o Servidor Está Funcionando
 
