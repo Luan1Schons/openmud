@@ -4,6 +4,25 @@
   <img src="openmud.png" alt="OpenMud Logo" width="400">
 </div>
 
+## Conexões Externas
+
+Para conectar a um servidor remoto (ex: Railway, VPS, etc.):
+
+**TinTin++:**
+```
+#session mud_local openmud-production.up.railway.app 4000
+```
+
+**Telnet:**
+```bash
+telnet openmud-production.up.railway.app 4000
+```
+
+**Netcat:**
+```bash
+nc openmud-production.up.railway.app 4000
+```
+
 ## Método 1: Usando o Script (Recomendado)
 
 ```bash

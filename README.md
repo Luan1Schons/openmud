@@ -49,8 +49,8 @@ Um jogo multiplayer tipo MUD (Multi-User Dungeon) que roda no terminal Linux, ot
 ### 1. Clone o Repositório
 
 ```bash
-git clone https://github.com/yourusername/terminal_game.git
-cd terminal_game
+git clone https://github.com/Luan1Schons/openmud.git
+cd openmud
 ```
 
 ### 2. Instale as Dependências
@@ -112,35 +112,51 @@ O servidor iniciará na porta **4000** por padrão. Você verá mensagens indica
 
 ### Conectar ao Jogo
 
-#### Usando TinTin++ (Recomendado)
+#### Conexão Local
 
-**Opção 1: Script automático**
-```bash
-./connect.sh
-```
-
-**Opção 2: Usando arquivo de configuração**
-```bash
-tt++ -t tintin_config.tin
-```
-
-**Opção 3: Conexão manual**
+**TinTin++ (Recomendado):**
 ```bash
 tt++
 #session mud_local localhost 4000
 ```
 
-#### Usando Telnet
-
+**Telnet:**
 ```bash
 telnet localhost 4000
 ```
 
-#### Usando Netcat
-
+**Netcat:**
 ```bash
 nc localhost 4000
 ```
+
+**Script automático:**
+```bash
+./connect.sh
+```
+
+#### Conexão Externa (Servidor Remoto)
+
+Para conectar a um servidor remoto (Railway, VPS, etc.):
+
+**TinTin++:**
+```
+#session mud_local openmud-production.up.railway.app 4000
+```
+
+**Telnet:**
+```bash
+telnet openmud-production.up.railway.app 4000
+```
+
+**Netcat:**
+```bash
+nc openmud-production.up.railway.app 4000
+```
+
+> **Nota:** O servidor já está configurado para aceitar conexões externas. Certifique-se de que:
+> - A porta 4000 (ou a porta configurada) está aberta no firewall
+> - O serviço de cloud (Railway, etc.) está configurado para usar a porta correta
 
 Para mais detalhes sobre conexão, consulte a [documentação completa](./docs/CONECTAR.md).
 

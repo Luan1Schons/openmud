@@ -6,6 +6,7 @@ Compatível com TinTin++ e outros clientes MUD
 """
 
 import asyncio
+import os
 from typing import Dict, Set, Optional
 from datetime import datetime
 
@@ -22,8 +23,10 @@ from mud.managers.dungeon_manager import DungeonManager
 from mud.utils.ansi import ANSI
 
 # Configurações do servidor
+# Aceita conexões de qualquer IP (0.0.0.0 = todas as interfaces)
 HOST = '0.0.0.0'
-PORT = 4000
+# Porta padrão: 4000, mas pode ser sobrescrita por variável de ambiente (útil para Railway, Heroku, etc.)
+PORT = int(os.environ.get('PORT', 4000))
 
 class MUDGame:
     """Gerenciador principal do jogo MUD"""
@@ -548,10 +551,19 @@ async def main():
     # Inicia task de regeneração de stamina
     asyncio.create_task(stamina_regeneration_task())
     
-    print(f"\nServidor iniciado em {HOST}:{PORT}")
-    print(f"Aguardando conexões...")
+    print(f"\n{'=' * 50}")
+    print(f"Servidor OpenMud MUD iniciado!")
+    print(f"{'=' * 50}")
+    print(f"Host: {HOST}")
+    print(f"Porta: {PORT}")
+    print(f"Modo: {'Produção' if os.environ.get('PORT') else 'Desenvolvimento'}")
+    print(f"\nAguardando conexões...")
     print(f"Sistema de regeneração de stamina ativo (1 ponto a cada 3 segundos)")
-    print("Pressione Ctrl+C para encerrar")
+    print(f"\nPara conectar:")
+    print(f"  Local: telnet localhost {PORT}")
+    print(f"  Externo: telnet <seu-ip> {PORT}")
+    print(f"  TinTin++: #session mud_local <seu-ip> {PORT}")
+    print(f"\nPressione Ctrl+C para encerrar")
     print("=" * 50)
     
     server = await asyncio.start_server(
