@@ -10,6 +10,60 @@
 
 Um jogo multiplayer tipo MUD (Multi-User Dungeon) que roda no terminal Linux, otimizado para uso com **TinTin++**.
 
+## 🌐 Servidor Online
+
+Você pode jogar agora mesmo no nosso servidor público:
+
+**Endereço:** `tramway.proxy.rlwy.net`  
+**Porta:** `57219`
+
+### Como Conectar
+
+#### Usando TinTin++ (Recomendado)
+```bash
+tt++
+#session openmud tramway.proxy.rlwy.net 57219
+```
+
+#### Usando Telnet
+```bash
+telnet tramway.proxy.rlwy.net 57219
+```
+
+#### Usando Netcat (nc)
+```bash
+nc tramway.proxy.rlwy.net 57219
+```
+
+#### Usando Putty (Windows)
+1. Abra o Putty
+2. Em "Connection type", selecione **Raw**
+3. Em "Host Name", digite: `tramway.proxy.rlwy.net`
+4. Em "Port", digite: `57219`
+5. Clique em **Open**
+
+### Exemplo de Conexão Completa
+
+**TinTin++:**
+```
+$ tt++
+#session openmud tramway.proxy.rlwy.net 57219
+#TRYING TO CONNECT 'openmud' TO 'tramway.proxy.rlwy.net' PORT '57219'.
+#CONNECTED TO 'openmud'
+Bem-vindo ao OpenMud MUD!
+>
+```
+
+**Telnet:**
+```bash
+$ telnet tramway.proxy.rlwy.net 57219
+Trying 66.33.22.156...
+Connected to tramway.proxy.rlwy.net.
+Escape character is '^]'.
+Bem-vindo ao OpenMud MUD!
+>
+```
+
 ## 📋 Índice
 
 - [Características](#-características)
@@ -137,32 +191,36 @@ nc localhost 4000
 
 #### Conexão Externa (Servidor Remoto)
 
-Para conectar a um servidor remoto (Railway, VPS, etc.):
+Para conectar a um **servidor remoto** (servidor de produção, Railway, VPS, etc.):
 
 **TinTin++:**
-```
-#session mud_local openmud-production.up.railway.app 4000
+```bash
+tt++
+#session openmud <servidor> <porta>
 ```
 
 **Telnet:**
 ```bash
-telnet openmud-production.up.railway.app 4000
+telnet <servidor> <porta>
 ```
 
 **Netcat:**
 ```bash
-nc openmud-production.up.railway.app 4000
+nc <servidor> <porta>
 ```
 
-> **Nota Importante sobre Railway:** O Railway não expõe portas TCP diretamente por padrão. Para conexões TCP (Telnet/TinTin++), você precisa:
-> - Configurar um **TCP Proxy** no Railway, OU
-> - Usar um **VPS** (recomendado para MUDs) que suporte conexões TCP diretas
-> 
-> Veja [DEPLOY_RAILWAY.md](./DEPLOY_RAILWAY.md) para mais detalhes sobre deploy no Railway.
+**Putty (Windows):**
+1. Abra o Putty
+2. Connection type: **Raw**
+3. Host Name: `<servidor>`
+4. Port: `<porta>`
+5. Clique em **Open**
 
 > **Nota:** O servidor já está configurado para aceitar conexões externas. Certifique-se de que:
 > - A porta está aberta no firewall
 > - O serviço de cloud está configurado corretamente para TCP
+> 
+> Para mais informações sobre deploy em serviços de cloud, veja [DEPLOY_RAILWAY.md](./DEPLOY_RAILWAY.md)
 
 Para mais detalhes sobre conexão, consulte a [documentação completa](./docs/CONECTAR.md).
 
