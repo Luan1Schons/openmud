@@ -326,15 +326,16 @@ class Player:
         """Cura o jogador"""
         self.current_hp = min(self.max_hp, self.current_hp + amount)
     
-    def add_item(self, item_id: str):
-        """Adiciona item ao inventário"""
-        if item_id not in self.inventory:
+    def add_item(self, item_id: str, amount: int = 1):
+        """Adiciona item ao inventário (empilha itens do mesmo tipo como no Minecraft)"""
+        for _ in range(amount):
             self.inventory.append(item_id)
     
-    def remove_item(self, item_id: str):
-        """Remove item do inventário"""
-        if item_id in self.inventory:
-            self.inventory.remove(item_id)
+    def remove_item(self, item_id: str, amount: int = 1):
+        """Remove item do inventário (remove apenas a quantidade especificada)"""
+        for _ in range(amount):
+            if item_id in self.inventory:
+                self.inventory.remove(item_id)
     
     def has_item(self, item_id: str, amount: int = 1) -> bool:
         """Verifica se tem item no inventário"""

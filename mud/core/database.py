@@ -121,6 +121,18 @@ class Database:
             )
         ''')
         
+        # Tabela de lores vistas (para rastrear quais lores o jogador já viu)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS viewed_lores (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                player_name TEXT NOT NULL,
+                world_id TEXT NOT NULL,
+                room_id TEXT NOT NULL,
+                viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(player_name, world_id, room_id)
+            )
+        ''')
+        
         # Índices para melhor performance
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_name ON players(name)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_world ON players(world_id)')
@@ -129,6 +141,8 @@ class Database:
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_quest_npc ON quests(npc_id)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_respawn_world_room ON monster_respawns(world_id, room_id)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_respawn_time ON monster_respawns(death_time)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_viewed_lores_player ON viewed_lores(player_name)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_viewed_lores_room ON viewed_lores(world_id, room_id)')
         
         conn.commit()
         conn.close()
@@ -545,6 +559,29 @@ class Database:
             AND (julianday('now') - julianday(death_time)) * 86400 >= respawn_time
         ''', (world_id, room_id))
         
+        conn.commit()
+        conn.close()
+    
+    def has_viewed_lore(self, player_name: str, world_id: str, room_id: str) -> bool:
+        """Verifica se o jogador já viu a lore desta sala"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT COUNT(*) FROM viewed_lores
+            WHERE player_name = ? AND world_id = ? AND room_id = ?
+        ''', (player_name, world_id, room_id))
+        count = cursor.fetchone()[0]
+        conn.close()
+        return count > 0
+    
+    def mark_lore_as_viewed(self, player_name: str, world_id: str, room_id: str):
+        """Marca a lore de uma sala como vista pelo jogador"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT OR IGNORE INTO viewed_lores (player_name, world_id, room_id)
+            VALUES (?, ?, ?)
+        ''', (player_name, world_id, room_id))
         conn.commit()
         conn.close()
 

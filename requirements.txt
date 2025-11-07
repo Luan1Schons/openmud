@@ -5,6 +5,9 @@
 # Para carregar variáveis de ambiente do .env
 python-dotenv>=1.0.0
 
+# Para servidor web e WebSocket
+websockets>=12.0
+
 # Opcional: Para usar IA na geração de quests
 # openai>=1.0.0  # Para OpenAI API
 # anthropic>=0.7.0  # Para Anthropic Claude API

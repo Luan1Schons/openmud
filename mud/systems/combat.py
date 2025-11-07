@@ -68,7 +68,7 @@ class CombatSystem:
         
         if not player.is_alive():
             await send_message_func(
-                f"{ANSI.BRIGHT_RED}💀 Você foi derrotado! 💀{ANSI.RESET}\r\n"
+                f"{ANSI.BRIGHT_RED} Você foi derrotado!{ANSI.RESET}\r\n"
             )
             return "player_died"
         
@@ -133,7 +133,7 @@ class CombatSystem:
         
         if not player.is_alive():
             await send_message_func(
-                f"{ANSI.BRIGHT_RED}💀 Você foi derrotado! 💀{ANSI.RESET}\r\n"
+                f"{ANSI.BRIGHT_RED} Você foi derrotado! {ANSI.RESET}\r\n"
             )
             return "player_died"
         

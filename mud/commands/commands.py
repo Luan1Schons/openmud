@@ -2,8 +2,10 @@
 Sistema de comandos do MUD
 """
 
+import unicodedata
+
 from typing import Optional, Dict, List
-from mud.core.models import Player, Monster
+from mud.core.models import Player, Monster, Room
 from mud.utils.ansi import ANSI, Colors
 from mud.managers.world_manager import WorldManager
 from mud.core.database import Database
@@ -14,6 +16,434 @@ from mud.managers.quest_manager import QuestManager
 
 class CommandHandler:
     """Processa comandos dos jogadores"""
+    
+    _MAP_TILE_WIDTH = 6
+    _MAP_TILE_HEIGHT = 4
+    _MAP_PATH_COLOR = ANSI.BRIGHT_YELLOW
+    _MAP_TILE_TEMPLATES = {
+        'forest': (
+            (
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+            ),
+            (
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+            ),
+            (
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+            ),
+            (
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.GREEN),
+                ('░', ANSI.BRIGHT_GREEN),
+            ),
+        ),
+        'swamp': (
+            (
+                ('≈', ANSI.BRIGHT_GREEN),
+                ('≈', ANSI.GREEN),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('≈', ANSI.GREEN),
+                ('≈', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('≈', ANSI.GREEN),
+                ('≈', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('≈', ANSI.GREEN),
+                ('≈', ANSI.BRIGHT_GREEN),
+            ),
+            (
+                ('≈', ANSI.GREEN),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('≈', ANSI.BRIGHT_GREEN),
+                ('≈', ANSI.GREEN),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('≈', ANSI.GREEN),
+            ),
+            (
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('≈', ANSI.GREEN),
+                ('≈', ANSI.BRIGHT_GREEN),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('≈', ANSI.GREEN),
+                ('≈', ANSI.BRIGHT_GREEN),
+            ),
+        ),
+        'water': (
+            (
+                ('≈', ANSI.BRIGHT_BLUE),
+                ('≈', ANSI.BRIGHT_CYAN),
+                ('~', ANSI.BRIGHT_BLUE),
+                ('≈', ANSI.BRIGHT_CYAN),
+                ('≈', ANSI.BRIGHT_BLUE),
+                ('~', ANSI.BRIGHT_CYAN),
+            ),
+            (
+                ('~', ANSI.BRIGHT_CYAN),
+                ('≈', ANSI.BRIGHT_BLUE),
+                ('≈', ANSI.BRIGHT_CYAN),
+                ('~', ANSI.BRIGHT_BLUE),
+                ('≈', ANSI.BRIGHT_CYAN),
+                ('≈', ANSI.BRIGHT_BLUE),
+            ),
+            (
+                ('≈', ANSI.BRIGHT_BLUE),
+                ('~', ANSI.BRIGHT_CYAN),
+                ('≈', ANSI.BRIGHT_BLUE),
+                ('≈', ANSI.BRIGHT_CYAN),
+                ('~', ANSI.BRIGHT_BLUE),
+                ('≈', ANSI.BRIGHT_CYAN),
+            ),
+            (
+                ('~', ANSI.BRIGHT_CYAN),
+                ('≈', ANSI.BRIGHT_BLUE),
+                ('≈', ANSI.BRIGHT_CYAN),
+                ('~', ANSI.BRIGHT_BLUE),
+                ('≈', ANSI.BRIGHT_CYAN),
+                ('≈', ANSI.BRIGHT_BLUE),
+            ),
+        ),
+        'mountain': (
+            (
+                ('▲', ANSI.BRIGHT_WHITE),
+                ('╱', ANSI.BRIGHT_BLACK),
+                ('╲', ANSI.BRIGHT_BLACK),
+                ('▲', ANSI.BRIGHT_WHITE),
+                ('╱', ANSI.BRIGHT_BLACK),
+                ('╲', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                ('╲', ANSI.BRIGHT_BLACK),
+                ('▲', ANSI.BRIGHT_WHITE),
+                ('╱', ANSI.BRIGHT_BLACK),
+                ('╲', ANSI.BRIGHT_BLACK),
+                ('▲', ANSI.BRIGHT_WHITE),
+                ('╱', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                ('▲', ANSI.BRIGHT_WHITE),
+                ('╱', ANSI.BRIGHT_BLACK),
+                ('╲', ANSI.BRIGHT_BLACK),
+                ('▲', ANSI.BRIGHT_WHITE),
+                ('╱', ANSI.BRIGHT_BLACK),
+                ('╲', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                ('╲', ANSI.BRIGHT_BLACK),
+                ('▲', ANSI.BRIGHT_WHITE),
+                ('╱', ANSI.BRIGHT_BLACK),
+                ('╲', ANSI.BRIGHT_BLACK),
+                ('▲', ANSI.BRIGHT_WHITE),
+                ('╱', ANSI.BRIGHT_BLACK),
+            ),
+        ),
+        'cave': (
+            (
+                ('▓', ANSI.BRIGHT_BLACK),
+                ('▒', ANSI.WHITE),
+                ('▓', ANSI.BRIGHT_BLACK),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('▓', ANSI.BRIGHT_BLACK),
+                ('▒', ANSI.WHITE),
+            ),
+            (
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('▓', ANSI.WHITE),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('▓', ANSI.WHITE),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('▓', ANSI.WHITE),
+            ),
+            (
+                ('▓', ANSI.BRIGHT_BLACK),
+                ('▒', ANSI.WHITE),
+                ('▓', ANSI.BRIGHT_BLACK),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('▓', ANSI.BRIGHT_BLACK),
+                ('▒', ANSI.WHITE),
+            ),
+            (
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('▓', ANSI.WHITE),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('▓', ANSI.WHITE),
+                ('▒', ANSI.BRIGHT_BLACK),
+                ('▓', ANSI.WHITE),
+            ),
+        ),
+        'city': (
+            (
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_WHITE),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_CYAN),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_WHITE),
+            ),
+            (
+                ('▒', ANSI.BRIGHT_WHITE),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_CYAN),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_WHITE),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+            ),
+            (
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_WHITE),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_CYAN),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_WHITE),
+            ),
+            (
+                ('▒', ANSI.BRIGHT_WHITE),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_CYAN),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+                ('▒', ANSI.BRIGHT_WHITE),
+                ('▓', ANSI.BRIGHT_MAGENTA),
+            ),
+        ),
+        'desert': (
+            (
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+            ),
+            (
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+            ),
+            (
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+            ),
+            (
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+                ('.', ANSI.YELLOW),
+                ('·', ANSI.BRIGHT_YELLOW),
+            ),
+        ),
+        'snow': (
+            (
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+            ),
+            (
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+            ),
+            (
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+            ),
+            (
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_CYAN),
+                ('✶', ANSI.BRIGHT_WHITE),
+            ),
+        ),
+        'lava': (
+            (
+                ('≈', ANSI.BRIGHT_RED),
+                ('≈', ANSI.RED),
+                ('~', ANSI.BRIGHT_RED),
+                ('≈', ANSI.RED),
+                ('≈', ANSI.BRIGHT_RED),
+                ('~', ANSI.RED),
+            ),
+            (
+                ('~', ANSI.RED),
+                ('≈', ANSI.BRIGHT_RED),
+                ('≈', ANSI.RED),
+                ('~', ANSI.BRIGHT_RED),
+                ('≈', ANSI.RED),
+                ('≈', ANSI.BRIGHT_RED),
+            ),
+            (
+                ('≈', ANSI.BRIGHT_RED),
+                ('~', ANSI.RED),
+                ('≈', ANSI.BRIGHT_RED),
+                ('≈', ANSI.RED),
+                ('~', ANSI.BRIGHT_RED),
+                ('≈', ANSI.RED),
+            ),
+            (
+                ('~', ANSI.RED),
+                ('≈', ANSI.BRIGHT_RED),
+                ('≈', ANSI.RED),
+                ('~', ANSI.BRIGHT_RED),
+                ('≈', ANSI.RED),
+                ('≈', ANSI.BRIGHT_RED),
+            ),
+        ),
+        'neutral': (
+            (
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+            ),
+            (
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+                ('·', ANSI.BRIGHT_BLACK),
+                ('·', ANSI.BRIGHT_WHITE),
+            ),
+        ),
+        'empty': (
+            (
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+            ),
+            (
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+                (' ', ANSI.BRIGHT_BLACK),
+            ),
+        ),
+    }
+    _MAP_ENV_SYMBOLS = {
+        'forest': ('♣', ANSI.BRIGHT_GREEN),
+        'swamp': ('≈', ANSI.GREEN),
+        'water': ('≈', ANSI.BRIGHT_CYAN),
+        'mountain': ('▲', ANSI.BRIGHT_WHITE),
+        'cave': ('◆', ANSI.BRIGHT_BLACK),
+        'city': ('■', ANSI.BRIGHT_MAGENTA),
+        'desert': ('·', ANSI.BRIGHT_YELLOW),
+        'snow': ('✶', ANSI.BRIGHT_WHITE),
+        'lava': ('♨', ANSI.BRIGHT_RED),
+        'neutral': ('●', ANSI.BRIGHT_WHITE),
+        'empty': (' ', ANSI.BRIGHT_BLACK),
+    }
+    _MAP_LEGEND_DESCRIPTIONS = {
+        'forest': 'Floresta / Grama',
+        'swamp': 'Pântano / Lama',
+        'water': 'Água / Costas',
+        'mountain': 'Montanha / Rocha',
+        'cave': 'Caverna / Subterrâneo',
+        'city': 'Construções / Cidade',
+        'desert': 'Deserto / Areia',
+        'snow': 'Neve / Gelo',
+        'lava': 'Lava / Vulcânico',
+        'neutral': 'Terreno neutro',
+    }
+    _MAP_ENV_KEYWORDS = [
+        ('lava', ('lava', 'vulcao', 'vulcão', 'magma', 'vulcanico', 'vulcânico')),
+        ('cave', ('caverna', 'catacumba', 'gruta', 'mina', 'cripta', 'subsolo', 'subterraneo', 'subterrâneo', 'tunel', 'túnel', 'ruina', 'ruína', 'ruinas', 'ruínas', 'catacumbas')),
+        ('swamp', ('pantano', 'pântano', 'brejo', 'lodo', 'lama', 'lodoso')),
+        ('water', ('rio', 'lago', 'mar', 'oceano', 'praia', 'cachoeira', 'porto', 'ilha', 'baia', 'baía', 'caverna marinha', 'laguna')),
+        ('snow', ('neve', 'gelo', 'glacial', 'inverno', 'gelado', 'gelada', 'tundra')),
+        ('forest', ('floresta', 'bosque', 'arvore', 'árvore', 'vale', 'campo', 'clareira', 'selva', 'grama', 'prado', 'raiz', 'folha', 'arvores', 'árvores', 'copa', 'tronco')),
+        ('mountain', ('montanha', 'pico', 'penhasco', 'falésia', 'falesia', 'rocha', 'desfiladeiro', 'cume', 'encosta', 'picos', 'cordilheira')),
+        ('city', ('cidade', 'praça', 'templo', 'torre', 'distrito', 'mercado', 'vilarejo', 'aldeia', 'fortaleza', 'castelo', 'oficina', 'sala', 'laboratorio', 'laboratório', 'casa', 'cabana', 'porto')),
+        ('desert', ('deserto', 'areia', 'duna', 'oasis', 'oásis', 'arido', 'árido', 'seco')),
+    ]
+    _MAP_OPPOSITE_DIRECTIONS = {
+        'norte': 'sul',
+        'sul': 'norte',
+        'leste': 'oeste',
+        'oeste': 'leste',
+        'nordeste': 'sudoeste',
+        'sudoeste': 'nordeste',
+        'noroeste': 'sudeste',
+        'sudeste': 'noroeste',
+        'cima': 'baixo',
+        'baixo': 'cima',
+    }
     
     def __init__(self, game, world_manager: WorldManager, database: Database, 
                  game_data: GameDataManager, lore_manager: LoreManager, quest_manager: QuestManager, world_lore_manager=None, dungeon_manager=None):
@@ -238,11 +668,15 @@ class CommandHandler:
         message = f"\r\n{Colors.TITLE}{room.name}{Colors.RESET}\r\n"
         message += f"{Colors.SEPARATOR}{'=' * len(room.name)}{Colors.RESET}\r\n\r\n"
         
-        # Descrição da sala + lore
+        # Descrição da sala + lore (apenas se ainda não foi vista)
         message += f"{Colors.DESCRIPTION}{room.description}{Colors.RESET}\r\n"
         room_lore = self.lore_manager.get_room_lore(player.world_id, player.room_id)
         if room_lore and 'story' in room_lore:
-            message += f"\r\n{Colors.INFO}{room_lore['story']}{Colors.RESET}\r\n"
+            # Verifica se o jogador já viu esta lore
+            if not self.database.has_viewed_lore(player.name, player.world_id, player.room_id):
+                message += f"\r\n{Colors.INFO}{room_lore['story']}{Colors.RESET}\r\n"
+                # Marca como vista
+                self.database.mark_lore_as_viewed(player.name, player.world_id, player.room_id)
         
         # Informações especiais do lobby
         if player.room_id == "lobby":
@@ -499,7 +933,7 @@ class CommandHandler:
         )
         
         # Mostra mensagem ao jogador
-        await self.send_message(player, f"{ANSI.BRIGHT_RED}💀 Você foi derrotado! 💀{ANSI.RESET}\r\n")
+        await self.send_message(player, f"{ANSI.BRIGHT_RED}Você foi derrotado!{ANSI.RESET}\r\n")
         
         if lost_item:
             await self.send_message(player, f"{ANSI.YELLOW}Você perdeu: {lost_item.name}{ANSI.RESET}\r\n")
@@ -1266,11 +1700,11 @@ class CommandHandler:
     
     async def _handle_monster_death(self, player: Player, monster: Monster, monster_instance_id: int, world_id: str, room_id: str):
         """Processa morte do monstro e verifica se há mais monstros para combater"""
-        # Remove instância do monstro
+            # Remove instância do monstro
         if monster_instance_id in self.monster_instances.get(world_id, {}).get(room_id, {}):
             del self.monster_instances[world_id][room_id][monster_instance_id]
-        
-        # Remove template da lista de entidades da sala
+            
+            # Remove template da lista de entidades da sala
         self.game_data.remove_monster_from_room(world_id, room_id, monster.id)
         
         # Limpa estado de combate
@@ -1278,13 +1712,13 @@ class CommandHandler:
             del self.in_combat[player.name]
         if player.name in self.combat_state:
             del self.combat_state[player.name]
-        
+            
         # Registra morte do monstro para sistema de respawn (5 minutos mínimo)
-        import random
-        if self.dungeon_manager:
-            respawn_config = self.dungeon_manager.get_room_respawn_time(
+            import random
+            if self.dungeon_manager:
+                respawn_config = self.dungeon_manager.get_room_respawn_time(
                 world_id, room_id, monster.id
-            )
+                )
             # Garante mínimo de 5 minutos (300 segundos)
             if respawn_config['min'] < 300:
                 respawn_config['min'] = 300
@@ -1369,7 +1803,7 @@ class CommandHandler:
                 # Inicia combate
                 self.in_combat[player.name] = f"{world_id}:{room_id}:{instance_id}"
                 await self._show_combat_menu(player)
-                return
+            return
         
         # Não há mais monstros
         await self.send_message(player, f"{ANSI.BRIGHT_GREEN}Você derrotou todos os monstros da sala!{ANSI.RESET}\r\n")
@@ -1504,6 +1938,139 @@ class CommandHandler:
         message += f"{ANSI.BRIGHT_MAGENTA}Ouro:{ANSI.RESET} {player.gold}\r\n"
         await self.send_message(player, message)
     
+    @staticmethod
+    def _normalize_text_for_map(text: Optional[str]) -> str:
+        if not text:
+            return ""
+        normalized = unicodedata.normalize('NFKD', text)
+        return ''.join(ch for ch in normalized.lower() if not unicodedata.combining(ch))
+
+    def _detect_room_environment(self, room: Room) -> str:
+        if not room:
+            return 'neutral'
+        full_text = ' '.join(filter(None, [room.id, room.name, room.description]))
+        normalized = self._normalize_text_for_map(full_text)
+        for env, keywords in self._MAP_ENV_KEYWORDS:
+            if any(keyword in normalized for keyword in keywords):
+                return env
+        return 'neutral'
+
+    def _clone_tile_template(self, env: str) -> List[List[tuple[str, str]]]:
+        template = self._MAP_TILE_TEMPLATES.get(env, self._MAP_TILE_TEMPLATES['neutral'])
+        return [[(char, color) for char, color in row] for row in template]
+
+    def _calculate_room_connectors(self, room_id: str, room_positions: Dict[str, tuple[int, int]], relevant_rooms: Dict[str, Room]) -> set:
+        connectors = set()
+        position = room_positions.get(room_id)
+        if not position:
+            return connectors
+        x, y = position
+        room = relevant_rooms[room_id]
+        neighbor_vectors = {
+            (0, -1): 'north',
+            (0, 1): 'south',
+            (1, 0): 'east',
+            (-1, 0): 'west',
+        }
+        for other_id, (ox, oy) in room_positions.items():
+            if other_id == room_id:
+                continue
+            dx = ox - x
+            dy = oy - y
+            direction = neighbor_vectors.get((dx, dy))
+            if not direction:
+                continue
+            other_room = relevant_rooms[other_id]
+            has_path = any(target == other_id for target in room.exits.values())
+            if not has_path:
+                has_path = any(target == room_id for target in other_room.exits.values())
+            if has_path:
+                connectors.add(direction)
+        return connectors
+
+    def _apply_connector_to_tile(self, tile: List[List[tuple[str, str]]], direction: str) -> None:
+        height = len(tile)
+        width = len(tile[0]) if height > 0 else 0
+        path_color = self._MAP_PATH_COLOR
+        if not height or not width:
+            return
+        mid_x = width // 2
+        mid_y = height // 2
+        if direction == 'north':
+            for row_idx in range(0, min(2, height)):
+                tile[row_idx][mid_x] = ('│', path_color)
+        elif direction == 'south':
+            for row_idx in range(max(height - 2, 0), height):
+                tile[row_idx][mid_x] = ('│', path_color)
+        elif direction == 'east':
+            for col_idx in range(max(width - 2, 0), width):
+                tile[mid_y][col_idx] = ('─', path_color)
+        elif direction == 'west':
+            for col_idx in range(0, min(2, width)):
+                tile[mid_y][col_idx] = ('─', path_color)
+
+    def _place_current_marker(self, tile: List[List[tuple[str, str]]]) -> None:
+        height = len(tile)
+        width = len(tile[0]) if height > 0 else 0
+        if not height or not width:
+            return
+        tile[height // 2][width // 2] = ('★', ANSI.BRIGHT_YELLOW)
+
+    def _place_environment_symbol(self, tile: List[List[tuple[str, str]]], env: str) -> None:
+        height = len(tile)
+        width = len(tile[0]) if height > 0 else 0
+        if not height or not width:
+            return
+        symbol_char, symbol_color = self._MAP_ENV_SYMBOLS.get(env, self._MAP_ENV_SYMBOLS['neutral'])
+        tile[height // 2][width // 2] = (symbol_char, symbol_color)
+
+    def _tile_to_strings(self, tile: List[List[tuple[str, str]]]) -> List[str]:
+        lines = []
+        for row in tile:
+            line_parts = []
+            for char, color in row:
+                line_parts.append(f"{color}{char}{ANSI.RESET}")
+            lines.append(''.join(line_parts) + ANSI.RESET)
+        return lines
+
+    def _build_room_tile_lines(
+        self,
+        room_id: str,
+        room_positions: Dict[str, tuple[int, int]],
+        relevant_rooms: Dict[str, Room],
+        current_room_id: str,
+    ) -> List[str]:
+        room = relevant_rooms[room_id]
+        env = self._detect_room_environment(room)
+        tile = self._clone_tile_template(env)
+        for connector in self._calculate_room_connectors(room_id, room_positions, relevant_rooms):
+            self._apply_connector_to_tile(tile, connector)
+        if room_id == current_room_id:
+            self._place_current_marker(tile)
+        else:
+            self._place_environment_symbol(tile, env)
+        return self._tile_to_strings(tile)
+
+    def _build_empty_tile_lines(self) -> List[str]:
+        return self._tile_to_strings(self._clone_tile_template('empty'))
+
+    def _get_direction_label_for_map(self, current_room: Room, target_room_id: str, world) -> Optional[str]:
+        direction_to_room = None
+        for direction, target in current_room.exits.items():
+            if target == target_room_id:
+                direction_to_room = direction
+                break
+        if not direction_to_room:
+            target_room = world.rooms.get(target_room_id) if world else None
+            if target_room:
+                for direction, dest in target_room.exits.items():
+                    if dest == current_room.id:
+                        direction_to_room = self._MAP_OPPOSITE_DIRECTIONS.get(direction, direction)
+                        break
+        if direction_to_room:
+            return direction_to_room.capitalize()
+        return None
+    
     async def cmd_mapa(self, player: Player):
         """Comando mapa - mostra um mapa minimalista: sala atual, anterior e próximas"""
         world = self.world_manager.get_world(player.world_id)
@@ -1553,7 +2120,6 @@ class CommandHandler:
         used_positions = {(1, 1)}
         
         # Posiciona salas que a atual leva (próximas)
-        next_index = 0
         for direction, target_room_id in current_room.exits.items():
             if target_room_id in relevant_rooms and target_room_id not in room_positions:
                 pos = direction_positions.get(direction, None)
@@ -1597,134 +2163,60 @@ class CommandHandler:
                                     break
                         break
         
-        # Cria grid simples 3x3 (cada célula é 30x3 caracteres)
-        cell_width = 30
-        cell_height = 3
-        grid_width = 3 * cell_width
-        grid_height = 3 * cell_height
-        
-        # Inicializa grid
-        grid = [[' ' for _ in range(grid_width)] for _ in range(grid_height)]
-        
-        # Desenha conexões primeiro
-        for room_id, (x, y) in room_positions.items():
+        position_to_room = {pos: room_id for room_id, pos in room_positions.items()}
+        tile_cache = {
+            room_id: self._build_room_tile_lines(room_id, room_positions, relevant_rooms, current_room_id)
+            for room_id in room_positions
+        }
+        empty_tile = self._build_empty_tile_lines()
+        grid_size = 3
+        map_lines = []
+        for y in range(grid_size):
+            for tile_row in range(self._MAP_TILE_HEIGHT):
+                row_segments = []
+                for x in range(grid_size):
+                    room_id = position_to_room.get((x, y))
+                    tile_lines = tile_cache.get(room_id, empty_tile)
+                    row_segments.append(tile_lines[tile_row])
+                map_lines.append(' '.join(row_segments) + ANSI.RESET)
+
+        sorted_rooms = sorted(position_to_room.items(), key=lambda item: (item[0][1], item[0][0]))
+        neighbors_info = []
+        for _pos, room_id in sorted_rooms:
             if room_id == current_room_id:
                 continue
-            
             room = relevant_rooms[room_id]
-            base_x = x * cell_width + cell_width // 2
-            base_y = y * cell_height + cell_height // 2
-            center_x = 1 * cell_width + cell_width // 2
-            center_y = 1 * cell_height + cell_height // 2
-            
-            # Desenha linha da sala atual para esta sala
-            if x == 1:  # Mesma coluna (vertical)
-                start_y = min(base_y, center_y)
-                end_y = max(base_y, center_y)
-                for cy in range(start_y, end_y + 1):
-                    if 0 <= cy < grid_height:
-                        if grid[cy][base_x] == ' ':
-                            grid[cy][base_x] = '│'
-            elif y == 1:  # Mesma linha (horizontal)
-                start_x = min(base_x, center_x)
-                end_x = max(base_x, center_x)
-                for cx in range(start_x, end_x + 1):
-                    if 0 <= base_y < grid_height and 0 <= cx < grid_width:
-                        if grid[base_y][cx] == ' ':
-                            grid[base_y][cx] = '─'
-        
-        # Desenha salas
-        for room_id, (x, y) in room_positions.items():
-            room = relevant_rooms[room_id]
-            base_x = x * cell_width
-            base_y = y * cell_height
-            
-            # Monta nome da sala com direção se for uma saída da sala atual
-            display_name = room.name
-            if room_id != current_room_id:
-                # Procura a direção que leva para esta sala
-                direction_to_room = None
-                for direction, target_room_id in current_room.exits.items():
-                    if target_room_id == room_id:
-                        direction_to_room = direction
-                        break
-                
-                # Se não encontrou nas saídas da atual, procura nas salas anteriores
-                if not direction_to_room:
-                    for other_room_id, other_room in world.rooms.items():
-                        if other_room_id != current_room_id:
-                            for direction, target_room_id in other_room.exits.items():
-                                if target_room_id == current_room_id and other_room_id == room_id:
-                                    # Esta sala leva para a atual, então a direção oposta
-                                    opposite_map = {
-                                        'norte': 'sul', 'sul': 'norte',
-                                        'leste': 'oeste', 'oeste': 'leste',
-                                        'nordeste': 'sudoeste', 'sudoeste': 'nordeste',
-                                        'sudeste': 'noroeste', 'noroeste': 'sudeste',
-                                        'noroeste': 'sudeste', 'sudeste': 'noroeste',
-                                        'cima': 'baixo', 'baixo': 'cima',
-                                    }
-                                    direction_to_room = opposite_map.get(direction, direction)
-                                    break
-                
-                if direction_to_room:
-                    # Formata direção de forma mais legível
-                    direction_display = direction_to_room.capitalize()
-                    display_name = f"[{direction_display}] {room.name}"
-            
-            # Nome da sala (truncado se necessário)
-            max_name_len = cell_width - 4
-            room_name = display_name
-            if len(room_name) > max_name_len:
-                truncated = display_name[:max_name_len-2]
-                last_space = truncated.rfind(' ')
-                if last_space > max_name_len // 2:
-                    room_name = truncated[:last_space] + '..'
-                else:
-                    room_name = truncated + '..'
-            
-            name_x = base_x + (cell_width - len(room_name)) // 2
-            
-            # Desenha caixa da sala
-            for cy in range(base_y, min(base_y + cell_height, grid_height)):
-                for cx in range(base_x, min(base_x + cell_width, grid_width)):
-                    if cy == base_y or cy == base_y + cell_height - 1:
-                        if cx == base_x:
-                            grid[cy][cx] = '┌' if cy == base_y else '└'
-                        elif cx == base_x + cell_width - 1:
-                            grid[cy][cx] = '┐' if cy == base_y else '┘'
-                        else:
-                            grid[cy][cx] = '─'
-                    elif cx == base_x or cx == base_x + cell_width - 1:
-                        grid[cy][cx] = '│'
-            
-            # Escreve nome da sala
-            if base_y + 1 < grid_height:
-                for i, char in enumerate(room_name):
-                    if name_x + i < grid_width and name_x + i >= base_x + 1 and name_x + i < base_x + cell_width - 1:
-                        grid[base_y + 1][name_x + i] = char
-            
-            # Marca sala atual
-            if room_id == current_room_id:
-                if base_y + 2 < grid_height and base_x + cell_width // 2 < grid_width:
-                    grid[base_y + 2][base_x + cell_width // 2] = '★'
-        
-        # Constrói string do mapa
-        map_lines = []
-        for row in grid:
-            line = ''.join(row).rstrip()
-            if line.strip():
-                map_lines.append(line)
-        
-        # Monta mensagem
+            env = self._detect_room_environment(room)
+            symbol_char, symbol_color = self._MAP_ENV_SYMBOLS.get(env, self._MAP_ENV_SYMBOLS['neutral'])
+            direction_label = self._get_direction_label_for_map(current_room, room_id, world)
+            if direction_label:
+                info_label = f"[{direction_label}] {room.name}"
+            else:
+                info_label = room.name
+            neighbors_info.append((symbol_char, symbol_color, info_label))
+
+        envs_in_map = {
+            self._detect_room_environment(relevant_rooms[room_id])
+            for room_id in relevant_rooms
+        }
+
         message = f"\r\n{ANSI.BOLD}{ANSI.BRIGHT_CYAN}=== Mapa Local ==={ANSI.RESET}\r\n\r\n"
         message += f"{ANSI.BRIGHT_YELLOW}Legenda:{ANSI.RESET}\r\n"
-        message += f"  {ANSI.BRIGHT_GREEN}★{ANSI.RESET} = Sua localização atual\r\n"
-        message += f"  {ANSI.BRIGHT_CYAN}│ ─{ANSI.RESET} = Caminhos\r\n\r\n"
-        
-        # Adiciona o mapa linha por linha
+        message += f"  {ANSI.BRIGHT_YELLOW}★{ANSI.RESET} = Sua localização atual\r\n"
+        message += f"  {self._MAP_PATH_COLOR}─│{ANSI.RESET} = Caminhos\r\n"
+        for env, description in self._MAP_LEGEND_DESCRIPTIONS.items():
+            if env in envs_in_map:
+                symbol_char, symbol_color = self._MAP_ENV_SYMBOLS.get(env, self._MAP_ENV_SYMBOLS['neutral'])
+                message += f"  {symbol_color}{symbol_char}{ANSI.RESET} = {description}\r\n"
+        message += "\r\n"
+
         for line in map_lines:
-            message += f"{ANSI.BRIGHT_WHITE}{line}{ANSI.RESET}\r\n"
+            message += f"{line}\r\n"
+
+        if neighbors_info:
+            message += f"\r\n{ANSI.BRIGHT_CYAN}Conexões próximas:{ANSI.RESET}\r\n"
+            for symbol_char, symbol_color, info_label in neighbors_info:
+                message += f"  {symbol_color}{symbol_char}{ANSI.RESET} {info_label}\r\n"
         
         message += f"\r\n{ANSI.BRIGHT_BLACK}Mostrando sala atual e conexões diretas{ANSI.RESET}\r\n"
         
@@ -1738,31 +2230,84 @@ class CommandHandler:
         return pages if pages else [[]]
     
     async def cmd_inventory(self, player: Player, args: str = ""):
-        """Comando inventory - mostra inventário com paginação e busca"""
+        """Comando inventory - mostra menu de categorias primeiro, depois itens da categoria escolhida"""
         from collections import Counter
         import re
         
-        # Parse argumentos: busca [página] ou [página]
+        # Se não há argumentos, mostra menu de categorias
+        if not args or args.strip() == "":
+            await self._show_inventory_categories(player)
+            return
+        
+        # Parse argumentos: categoria [busca] [página] ou número [página]
+        parts = args.split()
+        
+        # Verifica se primeiro argumento é um número (escolha de categoria)
+        category_choice = None
         search_term = ""
         page_num = 1
         
-        if args:
-            parts = args.split()
-            # Verifica se último argumento é um número (página)
-            if parts and parts[-1].isdigit():
-                page_num = int(parts[-1])
-                search_term = " ".join(parts[:-1])
+        if parts[0].isdigit():
+            # É um número, escolha de categoria
+            category_choice = int(parts[0])
+            # Resto são busca e/ou página
+            if len(parts) > 1:
+                if parts[-1].isdigit():
+                    page_num = int(parts[-1])
+                    search_term = " ".join(parts[1:-1])
+                else:
+                    search_term = " ".join(parts[1:])
+        else:
+            # Primeiro argumento pode ser nome de categoria ou busca
+            category_map = {
+                'weapon': 'weapon', 'arma': 'weapon', 'armas': 'weapon',
+                'armor': 'armor', 'armadura': 'armor', 'armaduras': 'armor',
+                'consumable': 'consumable', 'consumivel': 'consumable', 'consumíveis': 'consumable', 'consumiveis': 'consumable',
+                'misc': 'misc', 'miscelanea': 'misc', 'miscelânea': 'misc',
+                'all': 'all', 'todos': 'all', 'tudo': 'all'
+            }
+            
+            first_arg = parts[0].lower()
+            if first_arg in category_map:
+                category_choice = category_map[first_arg]
+                # Resto são busca e/ou página
+                if len(parts) > 1:
+                    if parts[-1].isdigit():
+                        page_num = int(parts[-1])
+                        search_term = " ".join(parts[1:-1])
+                    else:
+                        search_term = " ".join(parts[1:])
             else:
-                search_term = args
+                # É uma busca geral (sem categoria)
+                category_choice = 'all'
+                if parts[-1].isdigit():
+                    page_num = int(parts[-1])
+                    search_term = " ".join(parts[:-1])
+                else:
+                    search_term = args
         
         # Agrupa itens por ID
         item_counts = Counter(player.inventory)
         
-        # Filtra por busca se houver
+        # Mapeia escolha numérica para categoria
+        if isinstance(category_choice, int):
+            categories = ['weapon', 'armor', 'consumable', 'misc', 'all']
+            if 1 <= category_choice <= len(categories):
+                category_choice = categories[category_choice - 1]
+            else:
+                await self.send_message(player, f"{Colors.ERROR}Opção inválida!{Colors.RESET}")
+                await self._show_inventory_categories(player)
+                return
+        
+        # Filtra por categoria e busca
         filtered_items = []
         for item_id, count in sorted(item_counts.items()):
             item = self.game_data.get_item(item_id)
             if item:
+                # Filtra por categoria
+                if category_choice != 'all' and item.type != category_choice:
+                    continue
+                
                 # Busca no nome, descrição ou tipo
                 if not search_term or (
                     search_term.lower() in item.name.lower() or
@@ -1772,17 +2317,26 @@ class CommandHandler:
                 ):
                     filtered_items.append((item_id, count, item))
             else:
-                # Item não encontrado, inclui se não houver busca ou se o ID corresponder
-                if not search_term or search_term.lower() in item_id.lower():
-                    filtered_items.append((item_id, count, None))
+                # Item não encontrado
+                if category_choice == 'all' or category_choice == 'misc':
+                    if not search_term or search_term.lower() in item_id.lower():
+                        filtered_items.append((item_id, count, None))
         
         if not filtered_items:
+            category_name = {
+                'weapon': 'Armas',
+                'armor': 'Armaduras',
+                'consumable': 'Consumíveis',
+                'misc': 'Miscelânea',
+                'all': 'todas as categorias'
+            }.get(category_choice, category_choice)
+            
             if search_term:
                 await self.send_message(player, 
-                    f"{ANSI.YELLOW}Nenhum item encontrado com '{search_term}'.{ANSI.RESET}\r\n"
-                    f"{ANSI.BRIGHT_CYAN}Use: inventory [busca] [página]{ANSI.RESET}")
+                    f"{Colors.WARNING}Nenhum item encontrado em {category_name} com '{search_term}'.{Colors.RESET}\r\n"
+                    f"{Colors.COMMAND}Use: inventory para ver categorias{Colors.RESET}")
             else:
-                await self.send_message(player, f"{ANSI.YELLOW}Seu inventário está vazio.{ANSI.RESET}")
+                await self.send_message(player, f"{Colors.WARNING}Nenhum item em {category_name}.{Colors.RESET}")
             return
         
         # Paginação
@@ -1798,68 +2352,112 @@ class CommandHandler:
         
         current_page = pages[page_num - 1]
         
-        # Monta mensagem
-        message = f"\r\n{ANSI.BOLD}=== Inventário ==={ANSI.RESET}\r\n"
+        # Monta mensagem (versão compacta e resumida)
+        category_name = {
+            'weapon': '⚔ Armas',
+            'armor': '🛡 Armaduras',
+            'consumable': '🧪 Consumíveis',
+            'misc': '📦 Miscelânea',
+            'all': '📋 Todos os Itens'
+        }.get(category_choice, category_choice.capitalize())
+        
+        message = f"\r\n{Colors.TITLE}=== Inventário: {category_name} ==={Colors.RESET}\r\n"
         
         if search_term:
-            message += f"{ANSI.BRIGHT_CYAN}Busca: '{search_term}'{ANSI.RESET}\r\n"
+            message += f"{Colors.LABEL}Busca: '{search_term}'{Colors.RESET}\r\n"
         
-        message += f"{ANSI.BRIGHT_BLACK}Página {page_num}/{total_pages} | Total: {len(filtered_items)} itens únicos{ANSI.RESET}\r\n\r\n"
+        total_items = sum(count for _, count, _ in filtered_items)
+        message += f"{Colors.HINT}Página {page_num}/{total_pages} | {len(filtered_items)} tipos | {total_items} itens totais{Colors.RESET}\r\n\r\n"
         
+        # Mostra itens da categoria (já filtrados)
         for item_id, count, item in current_page:
             if item:
-                count_text = f" {ANSI.BRIGHT_CYAN}x{count}{ANSI.RESET}" if count > 1 else ""
+                # Versão compacta: nome, quantidade, raridade, stats resumidos
+                count_text = f"{Colors.VALUE}x{count}{Colors.RESET}" if count > 1 else ""
                 rarity_color = item.get_rarity_color()
-                rarity_text = f" {ANSI.BRIGHT_BLACK}[{item.rarity.upper()}]{ANSI.RESET}" if item.rarity != "common" else ""
-                type_text = f"{ANSI.BRIGHT_BLACK}({item.type}){ANSI.RESET}"
+                rarity_text = f" {Colors.HINT}[{item.rarity.upper()}]{Colors.RESET}" if item.rarity != "common" else ""
                 
                 # Verifica se está equipado
                 is_equipped = player.is_item_equipped(item_id)
-                equipped_text = f" {ANSI.BRIGHT_GREEN}[EQUIPADO]{ANSI.RESET}" if is_equipped else ""
+                equipped_text = f" {Colors.SUCCESS}[E]{Colors.RESET}" if is_equipped else ""
                 
-                message += f"  {rarity_color}{item.name}{ANSI.RESET}{count_text}{rarity_text} {type_text}{equipped_text}\r\n"
-                message += f"    {ANSI.WHITE}{item.description}{ANSI.RESET}\r\n"
-                
-                # Mostra stats do item se for weapon ou armor
+                # Stats resumidos em uma linha
+                stats_parts = []
                 if item.type in ['weapon', 'armor'] and item.stats:
-                    stats_text = []
                     if item.stats.get('attack', 0) > 0:
-                        stats_text.append(f"{ANSI.BRIGHT_CYAN}+{item.stats['attack']} Ataque{ANSI.RESET}")
+                        stats_parts.append(f"{Colors.INFO}+{item.stats['attack']}⚔{Colors.RESET}")
                     if item.stats.get('defense', 0) > 0:
-                        stats_text.append(f"{ANSI.BRIGHT_BLUE}+{item.stats['defense']} Defesa{ANSI.RESET}")
-                    if stats_text:
-                        message += f"    {ANSI.BRIGHT_GREEN}Stats: {', '.join(stats_text)}{ANSI.RESET}\r\n"
+                        stats_parts.append(f"{Colors.INFO}+{item.stats['defense']}🛡{Colors.RESET}")
                 
-                if item.value > 0:
-                    message += f"    {ANSI.BRIGHT_YELLOW}💰 Valor: {item.value} moedas{ANSI.RESET}\r\n"
+                stats_text = f" {' '.join(stats_parts)}" if stats_parts else ""
                 
-                # Mostra comando para equipar/desequipar
-                if item.type in ['weapon', 'armor']:
-                    if is_equipped:
-                        message += f"    {ANSI.BRIGHT_CYAN}Use: unequip {item.name} para desequipar{ANSI.RESET}\r\n"
-                    else:
-                        message += f"    {ANSI.BRIGHT_CYAN}Use: equip {item.name} para equipar{ANSI.RESET}\r\n"
-                
-                message += "\r\n"
+                # Linha compacta: nome, quantidade, raridade, stats, equipado
+                message += f"  {rarity_color}{item.name}{Colors.RESET} {count_text}{rarity_text}{stats_text}{equipped_text}\r\n"
             else:
-                message += f"  {ANSI.YELLOW}[Item não encontrado: {item_id}]{ANSI.RESET} x{count}\r\n"
+                message += f"  {Colors.WARNING}[Item não encontrado: {item_id}]{Colors.RESET} {Colors.VALUE}x{count}{Colors.RESET}\r\n"
         
-        # Navegação
-        message += f"\r\n{ANSI.BRIGHT_GREEN}Total de itens: {len(player.inventory)}{ANSI.RESET}\r\n"
+        message += "\r\n"
+        
+        # Resumo total
+        message += f"{Colors.INFO}Total: {total_items} itens em {len(filtered_items)} tipos diferentes{Colors.RESET}\r\n"
         
         if total_pages > 1:
-            message += f"\r\n{ANSI.BRIGHT_CYAN}Navegação:{ANSI.RESET}\r\n"
+            message += f"\r\n{Colors.LABEL}Navegação:{Colors.RESET}\r\n"
             if page_num > 1:
-                nav_cmd = f"inventory {search_term} {page_num - 1}".strip() if search_term else f"inventory {page_num - 1}"
-                message += f"  {ANSI.BRIGHT_GREEN}{nav_cmd}{ANSI.RESET} - Página anterior\r\n"
+                nav_cmd = f"inventory {category_choice} {search_term} {page_num - 1}".strip() if search_term else f"inventory {category_choice} {page_num - 1}".strip()
+                message += f"  {Colors.COMMAND}{nav_cmd}{Colors.RESET} - Página anterior\r\n"
             if page_num < total_pages:
-                nav_cmd = f"inventory {search_term} {page_num + 1}".strip() if search_term else f"inventory {page_num + 1}"
-                message += f"  {ANSI.BRIGHT_GREEN}{nav_cmd}{ANSI.RESET} - Próxima página\r\n"
+                nav_cmd = f"inventory {category_choice} {search_term} {page_num + 1}".strip() if search_term else f"inventory {category_choice} {page_num + 1}".strip()
+                message += f"  {Colors.COMMAND}{nav_cmd}{Colors.RESET} - Próxima página\r\n"
         
+        message += f"\r\n{Colors.HINT}Use: {Colors.COMMAND}inventory{Colors.RESET} para ver categorias\r\n"
         if search_term:
-            message += f"  {ANSI.BRIGHT_GREEN}inventory{ANSI.RESET} - Ver todos os itens\r\n"
-        else:
-            message += f"  {ANSI.BRIGHT_GREEN}inventory <busca>{ANSI.RESET} - Buscar itens\r\n"
+            message += f"{Colors.HINT}Use: {Colors.COMMAND}inventory {category_choice}{Colors.RESET} para ver todos os itens desta categoria\r\n"
+        
+        await self.send_message(player, message)
+    
+    async def _show_inventory_categories(self, player: Player):
+        """Mostra menu de categorias do inventário"""
+        from collections import Counter
+        
+        if not player.inventory:
+            await self.send_message(player, f"{Colors.WARNING}Seu inventário está vazio.{Colors.RESET}")
+            return
+        
+        # Conta itens por categoria
+        item_counts = Counter(player.inventory)
+        category_counts = {
+            'weapon': 0,
+            'armor': 0,
+            'consumable': 0,
+            'misc': 0
+        }
+        
+        for item_id, count in item_counts.items():
+            item = self.game_data.get_item(item_id)
+            if item and item.type in category_counts:
+                category_counts[item.type] += count
+        
+        # Monta menu
+        message = f"\r\n{Colors.TITLE}=== Inventário - Escolha uma Categoria ==={Colors.RESET}\r\n\r\n"
+        
+        categories = [
+            ('weapon', '⚔ Armas', category_counts['weapon']),
+            ('armor', '🛡 Armaduras', category_counts['armor']),
+            ('consumable', '🧪 Consumíveis', category_counts['consumable']),
+            ('misc', '📦 Miscelânea', category_counts['misc']),
+            ('all', '📋 Todos os Itens', len(player.inventory))
+        ]
+        
+        for i, (cat_id, cat_name, count) in enumerate(categories, 1):
+            if count > 0 or cat_id == 'all':
+                message += f"  {Colors.VALUE}{i}{Colors.RESET} - {Colors.CATEGORY}{cat_name}{Colors.RESET} ({Colors.NUMBER}{count}{Colors.RESET} itens)\r\n"
+        
+        message += f"\r\n{Colors.HINT}Digite o número da categoria ou: {Colors.COMMAND}inventory <categoria> [busca] [página]{Colors.RESET}\r\n"
+        message += f"{Colors.HINT}Exemplos:{Colors.RESET}\r\n"
+        message += f"  {Colors.COMMAND}inventory 1{Colors.RESET} - Ver armas\r\n"
+        message += f"  {Colors.COMMAND}inventory consumable{Colors.RESET} - Ver consumíveis\r\n"
+        message += f"  {Colors.COMMAND}inventory 2 poção{Colors.RESET} - Buscar 'poção' em armaduras\r\n"
         
         await self.send_message(player, message)
     
